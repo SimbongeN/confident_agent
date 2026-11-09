@@ -1,0 +1,2285 @@
+﻿id,category,course,topic,obscurity,scoring,prompt,ground_truth,response,latency_s,correct,hallucination,notes
+A01,A_Lesson,COMP301,Coupling,1,manual_claims,Explain the difference between tight coupling and loose coupling in software design. Give one example of each in Java.,Tight: a class depends directly on concrete implementation of another (e.g. new ConcreteClass() inside it). Loose: depends on abstractions/interfaces so implementations can be swapped (e.g. constructor-injected interface). Java examples must show this.,"In software design, coupling refers to the degree of interdependence between two or more modules, classes, or components. Tight coupling and loose coupling are two extremes of this concept.
+
+**Tight Coupling:**
+Tight coupling occurs when two modules or classes are highly interdependent, making it difficult to change or replace one without affecting the other. This can lead to a rigid and inflexible system, making it harder to maintain, test, and evolve.
+
+Example in Java:
+```java
+public class UserDAO {
+    public User getUser(int id) {
+        // Directly access the database
+        Database db = new Database();
+        return db.getUser(id);
+    }
+}
+
+public class Database {
+    public User getUser(int id) {
+        // Perform database query
+        // ...
+    }
+}
+```
+In this example, the `UserDAO` class is tightly coupled to the `Database` class. If we want to switch to a different database or add a caching layer, we would need to modify the `UserDAO` class, which could have unintended consequences.
+
+**Loose Coupling:**
+Loose coupling occurs when two modules or classes are minimally interdependent, making it easier to change or replace one without affecting the other. This promotes modularity, flexibility, and maintainability.
+
+Example in Java:
+```java
+public interface UserRepository {
+    User getUser(int id);
+}
+
+public class DatabaseUserRepository implements UserRepository {
+    public User getUser(int id) {
+        // Perform database query
+        // ...
+    }
+}
+
+public class CacheUserRepository implements UserRepository {
+    private final UserRepository databaseRepository;
+
+    public CacheUserRepository(UserRepository databaseRepository) {
+        this.databaseRepository = databaseRepository;
+    }
+
+    public User getUser(int id) {
+        // Check cache first
+        // ...
+        // If not in cache, delegate to database repository
+        return databaseRepository.getUser(id);
+    }
+}
+```
+In this example, the `UserRepository` interface defines a minimal interface for accessing user data. The `DatabaseUserRepository` class implements this interface, while the `CacheUserRepository` class also implements it, but with a caching layer on top. This loose coupling allows us to easily switch between different data sources or add caching without affecting other parts of the system.
+
+In summary, tight coupling makes it difficult to change or replace components, while loose coupling promotes modularity, flexibility, and maintainability.",53.6,,,
+A02,A_Lesson,COMP301,DIP,1,manual_claims,Explain the Dependency Inversion Principle (DIP). Provide a Java example demonstrating how DIP can reduce coupling between two classes.,"High-level modules should not depend on low-level modules; both should depend on abstractions. Abstractions should not depend on details. Example must introduce an interface that both sides depend on, with the dependency injected.","**Dependency Inversion Principle (DIP)**
+=====================================
+
+The Dependency Inversion Principle (DIP) is a design principle that aims to reduce coupling between classes in object-oriented systems. It states that:
+
+*   High-level modules (classes) should not depend on low-level modules (classes). Instead, both should depend on abstractions.
+*   Abstractions should not depend on details. Details should depend on abstractions.
+
+In other words, DIP encourages a decoupling of classes based on their interfaces, rather than their implementation details. This makes it easier to test, maintain, and extend the system.
+
+**Benefits of DIP**
+-----------------
+
+*   **Loose Coupling**: Reduces coupling between classes, making it easier to change or replace one class without affecting others.
+*   **Testability**: Easier to test classes that are decoupled from each other.
+*   **Flexibility**: Allows for more flexibility in the system, as classes can be easily swapped out or replaced.
+
+**Java Example: DIP in Action**
+-----------------------------
+
+Let's consider a simple example of a `PaymentGateway` class that depends on a `PaymentProcessor` class. We'll refactor this to follow the DIP.
+
+**Before (Tight Coupling)**
+```java
+public class PaymentGateway {
+    private PaymentProcessor paymentProcessor;
+
+    public PaymentGateway(PaymentProcessor paymentProcessor) {
+        this.paymentProcessor = paymentProcessor;
+    }
+
+    public void processPayment(Payment payment) {
+        paymentProcessor.processPayment(payment);
+    }
+}
+
+public class PaymentProcessor {
+    public void processPayment(Payment payment) {
+        // implementation details
+    }
+}
+```
+
+In this example, the `PaymentGateway` class is tightly coupled to the `PaymentProcessor` class. If we want to switch to a different payment processor, we'd have to modify the `PaymentGateway` class.
+
+**After (Loose Coupling)**
+```java
+public interface PaymentProcessor {
+    void processPayment(Payment payment);
+}
+
+public class CreditCardPaymentProcessor implements PaymentProcessor {
+    @Override
+    public void processPayment(Payment payment) {
+        // implementation details
+    }
+}
+
+public class PayPalPaymentProcessor implements PaymentProcessor {
+    @Override
+    public void processPayment(Payment payment) {
+        // implementation details
+    }
+}
+
+public class PaymentGateway {
+    private PaymentProcessor paymentProcessor;
+
+    public PaymentGateway(PaymentProcessor paymentProcessor) {
+        this.paymentProcessor = paymentProcessor;
+    }
+
+    public void processPayment(Payment payment) {
+        paymentProcessor.processPayment(payment);
+    }
+}
+```
+
+In this refactored example, we've introduced an `PaymentProcessor` interface that defines the `processPayment` method. We've also created concrete implementations of this interface, `CreditCardPaymentProcessor` and `PayPalPaymentProcessor`.
+
+The `PaymentGateway` class now depends on the `PaymentProcessor` interface, rather than a specific implementation. This makes it easier to",63.6,,,
+A03,A_Lesson,COMP301,LSP,1,manual_claims,Explain the Liskov Substitution Principle (LSP) using a simple Java example. Also explain what could happen if a subclass violates LSP.,"Objects of a subtype must be usable wherever the supertype is expected without breaking program correctness (Barbara Liskov). Violations cause broken client assumptions, unexpected exceptions, strengthened preconditions (e.g. Rectangle/Square).","**What is the Liskov Substitution Principle (LSP)?**
+
+The Liskov Substitution Principle (LSP) is a fundamental concept in object-oriented programming (OOP) that ensures that subtypes can replace their base types without affecting the correctness of the program. In other words, if a base class has a certain behavior, a subtype should be able to provide the same behavior without any issues.
+
+**Java Example:**
+
+Let's consider a simple example of a `Vehicle` class and its subtypes `Car` and `Truck`.
+
+```java
+// Base class
+public class Vehicle {
+    public void honk() {
+        System.out.println(""Honk!"");
+    }
+
+    public void accelerate() {
+        System.out.println(""Accelerating..."");
+    }
+}
+
+// Subclass
+public class Car extends Vehicle {
+    @Override
+    public void accelerate() {
+        System.out.println(""Car is accelerating..."");
+    }
+}
+
+// Subclass
+public class Truck extends Vehicle {
+    @Override
+    public void accelerate() {
+        System.out.println(""Truck is accelerating with a heavy load..."");
+    }
+}
+```
+
+In this example, `Car` and `Truck` are subtypes of `Vehicle`. The `accelerate()` method is overridden in both subtypes to provide a more specific implementation. The `honk()` method is not overridden, as it is not relevant to the specific behavior of a car or a truck.
+
+**LSP Compliance:**
+
+The `Car` and `Truck` classes comply with the LSP because they can be used in place of the `Vehicle` class without affecting the correctness of the program. The `honk()` method is still available, and the `accelerate()` method is overridden to provide a more specific implementation.
+
+**Violating the LSP:**
+
+If a subclass violates the LSP, it can lead to unexpected behavior or errors. In our example, if we try to use a `Car` or a `Truck` object as a `Vehicle` object, the program may not behave as expected.
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        Vehicle vehicle = new Car();
+        vehicle.honk(); // This will work, but it's not the expected behavior
+        vehicle.accelerate(); // This will work, but it's not the expected behavior
+    }
+}
+```
+
+In this example, using a `Car` object as a `Vehicle` object will not produce an error, but it's not the expected behavior. The `honk()` method is still available, but it's not relevant to the specific behavior of a car.
+
+Similarly, if we try to use a `Truck` object as a `Vehicle` object, the program may not behave as expected.
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        Vehicle vehicle = new Truck();
+        vehicle.honk(); // This will",64.8,,,
+A04,A_Lesson,COMP301,Observer,1,manual_claims,Explain the Observer design pattern. Describe the relationship between the Subject/Observable and its Observers and explain what happens when the Subject's state changes.,One-to-many dependency. Subject keeps a list of observers; when its state changes it notifies all registered observers automatically (they update themselves). Promotes loose coupling.,"The Observer design pattern is a behavioral pattern that allows an object (the Subject/Observable) to notify multiple objects (the Observers) about changes to its state. This pattern is useful when you need to update multiple objects in response to changes in a single object.
+
+**Key Components:**
+
+1. **Subject/Observable**: This is the object that is being observed. It maintains a list of observers and notifies them when its state changes.
+2. **Observer**: This is the object that is interested in the state of the subject. It registers itself with the subject and receives notifications when the subject's state changes.
+
+**Relationship between Subject/Observable and Observers:**
+
+The subject and observers have a one-to-many relationship. The subject maintains a list of observers, and each observer registers itself with the subject. When the subject's state changes, it notifies all its registered observers.
+
+**How it Works:**
+
+Here's a step-by-step explanation of the process:
+
+1. An observer registers itself with the subject by calling the `registerObserver()` method.
+2. The subject maintains a list of observers and checks for new registrations.
+3. When the subject's state changes, it calls the `notifyObservers()` method, passing the new state as an argument.
+4. The subject iterates over its list of observers and calls the `update()` method on each observer, passing the new state as an argument.
+5. The observer receives the notification and updates its own state accordingly.
+
+**Example:**
+
+Consider a weather monitoring system where multiple weather stations observe the current weather conditions. The weather station is the subject, and the weather stations are the observers. When the weather changes, the weather station notifies all its registered observers, which then update their own displays to reflect the new weather conditions.
+
+**Code Example (Java):**
+
+```java
+// Subject (WeatherStation)
+public class WeatherStation {
+    private List<Observer> observers;
+    private int temperature;
+
+    public WeatherStation() {
+        observers = new ArrayList<>();
+    }
+
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    public void notifyObservers(int temperature) {
+        for (Observer observer : observers) {
+            observer.update(temperature);
+        }
+    }
+
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
+        notifyObservers(temperature);
+    }
+}
+
+// Observer (WeatherStationObserver)
+public class WeatherStationObserver implements Observer {
+    private String name;
+
+    public WeatherStationObserver(String name) {
+        this.name = name;
+    }
+
+    public void update(int temperature) {
+        System.out.println(name + "" temperature: "" + temperature);
+    }
+}
+```
+
+In this example, the `WeatherStation` class implements the subject, and the `WeatherStationObserver` class implements the observer. When the weather station's temperature changes, it notifies all its registered observers, which then update their own displays to reflect",63.3,,,
+A05,A_Lesson,COMP301,OCP,1,manual_claims,What does the Open/Closed Principle mean? Explain how a Java program can be extended without modifying existing source code.,Software entities should be open for extension but closed for modification. In Java: abstractions (interfaces/abstract classes) and polymorphism so new behaviour is added via new classes.,"The Open/Closed Principle (OCP) is a fundamental concept in software design, introduced by Bertrand Meyer in 1988. It states that:
+
+**""Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification.""**
+
+In other words, a design should be flexible and adaptable, allowing new functionality to be added without altering the existing codebase. This principle is essential for maintaining a clean, maintainable, and scalable software system.
+
+To achieve this, a Java program can be designed to be open for extension and closed for modification by using the following strategies:
+
+1. **Inheritance**: Create a base class or interface that defines the common behavior, and then create derived classes or interfaces that extend the base class or implement the interface. This allows new classes to inherit the behavior of the base class without modifying it.
+2. **Polymorphism**: Use method overriding or method overloading to provide a way to extend the behavior of a class without changing its underlying implementation.
+3. **Composition**: Use object composition to create a new object that contains an instance of an existing class. This allows new functionality to be added to the existing class without modifying it.
+4. **Dependency Injection**: Use dependency injection to provide a way to inject new dependencies into an existing class without modifying its implementation.
+
+Here's an example of how the OCP can be applied in Java:
+```java
+// Base class
+public abstract class Vehicle {
+    public abstract void drive();
+}
+
+// Derived class
+public class Car extends Vehicle {
+    @Override
+    public void drive() {
+        System.out.println(""Driving a car"");
+    }
+}
+
+// New class that extends the base class
+public class ElectricCar extends Vehicle {
+    @Override
+    public void drive() {
+        System.out.println(""Driving an electric car"");
+    }
+}
+
+// New class that uses composition
+public class ElectricMotor {
+    private Vehicle vehicle;
+
+    public ElectricMotor(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+
+    public void drive() {
+        vehicle.drive();
+    }
+}
+```
+In this example, the `Car` and `ElectricCar` classes extend the `Vehicle` class, allowing new functionality to be added to the existing class without modifying it. The `ElectricMotor` class uses composition to contain an instance of the `Vehicle` class, allowing new functionality to be added to the existing class without modifying it.
+
+By applying the Open/Closed Principle, you can create a design that is flexible, maintainable, and scalable, making it easier to extend the functionality of your software system without modifying existing source code.",56.7,,,
+A06,A_Lesson,COMP301,SRP,1,manual_claims,Explain the Single Responsibility Principle. Give a short Java example of a class that violates it and show how to refactor it.,A class should have only one reason to change (one responsibility/actor). Example must show a class mixing concerns (e.g. logic + persistence + printing) split into separate classes.,"**Single Responsibility Principle (SRP)**
+
+The Single Responsibility Principle is a design principle that states a class should have only one reason to change. In other words, a class should have a single, well-defined responsibility or purpose. This principle is based on the idea that a class should be focused on a single task or functionality, and not be responsible for multiple, unrelated tasks.
+
+**Why is SRP important?**
+
+A class that violates SRP can become complex, hard to maintain, and difficult to test. When a class has multiple responsibilities, it can lead to:
+
+*   Tight coupling between classes
+*   Increased complexity
+*   Difficulty in understanding the class's purpose
+*   Increased maintenance costs
+
+**Java Example: Violating SRP**
+
+Consider a `User` class that has both `getUserDetails()` and `sendWelcomeEmail()` methods:
+```java
+public class User {
+    private String name;
+    private String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public String getUserDetails() {
+        return ""Name: "" + name + "", Email: "" + email;
+    }
+
+    public void sendWelcomeEmail() {
+        System.out.println(""Sending welcome email to "" + email);
+    }
+}
+```
+In this example, the `User` class has two responsibilities: storing user details and sending welcome emails. This violates the SRP, as the class is now responsible for two unrelated tasks.
+
+**Refactoring to SRP**
+
+To refactor the `User` class to follow the SRP, we can create a new class, `UserRepository`, that is responsible for storing user details and another class, `EmailService`, that is responsible for sending welcome emails:
+```java
+public class UserRepository {
+    private Map<String, User> users = new HashMap<>();
+
+    public void addUser(User user) {
+        users.put(user.getEmail(), user);
+    }
+
+    public User getUser(String email) {
+        return users.get(email);
+    }
+}
+
+public class EmailService {
+    public void sendWelcomeEmail(User user) {
+        System.out.println(""Sending welcome email to "" + user.getEmail());
+    }
+}
+```
+We can then modify the `User` class to only store user details and use the `UserRepository` and `EmailService` classes to perform the other tasks:
+```java
+public class User {
+    private String name;
+    private String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public String getUserDetails() {
+        return ""Name: "" + name + "", Email: "" + email;
+    }
+
+    public void saveToRepository(UserRepository repository) {
+        repository.addUser(this);
+    }
+}
+```
+In this refactored example, the `User` class has only one responsibility: storing user details. The `UserRepository` class is responsible for storing user details,",65.0,,,
+A07,A_Lesson,COMP301,ISP,2,manual_claims,Explain the Interface Segregation Principle with a Java example.,"Clients should not be forced to depend on methods they do not use. Prefer several small, client-specific interfaces over one large interface. Example splits a fat interface.","The Interface Segregation Principle (ISP) is a design principle in object-oriented programming that states:
+
+""Instead of making many clients depend on an interface, make each client depend on the interface that it uses.""
+
+In other words, instead of having a single, very broad interface that many classes implement, it's better to have multiple, more specialized interfaces that each class implements, depending on its specific needs.
+
+Here's an example in Java:
+
+**Before (Bad Design)**
+
+```java
+public interface PaymentGateway {
+    void processPayment();
+    void refundPayment();
+    void sendInvoice();
+    void sendConfirmationEmail();
+}
+
+public class PayPal implements PaymentGateway {
+    // implementation
+}
+
+public class Stripe implements PaymentGateway {
+    // implementation
+}
+
+public class BankTransfer implements PaymentGateway {
+    // implementation
+}
+```
+
+In this example, the `PaymentGateway` interface has many methods that are not relevant to all payment gateways. The `PayPal` class, `Stripe` class, and `BankTransfer` class all implement the same interface, which means they all have to implement these unnecessary methods.
+
+**After (Good Design)**
+
+```java
+public interface PayPalGateway {
+    void processPayment();
+    void sendConfirmationEmail();
+}
+
+public interface StripeGateway {
+    void processPayment();
+    void sendInvoice();
+}
+
+public interface BankTransferGateway {
+    void processPayment();
+    void refundPayment();
+}
+
+public class PayPal implements PayPalGateway {
+    // implementation
+}
+
+public class Stripe implements StripeGateway {
+    // implementation
+}
+
+public class BankTransfer implements BankTransferGateway {
+    // implementation
+}
+```
+
+In this example, each payment gateway interface has only the methods that are relevant to that specific gateway. The `PayPal` class, `Stripe` class, and `BankTransfer` class all implement the interfaces that are relevant to their specific needs.
+
+By using multiple, more specialized interfaces, we've made each class more focused and easier to maintain. We've also reduced the coupling between classes, making it easier to change or replace one class without affecting others.
+
+Note that this is just one possible way to apply the ISP principle. The key idea is to identify the specific interfaces that each class needs to implement, and to create those interfaces, rather than relying on a single, broad interface.",45.7,,,
+A08,A_Lesson,COMP200,Encapsulation,1,manual_claims,Explain encapsulation in Java and list the four access modifiers with what each allows.,"Encapsulation: bundling data and behaviour and hiding internal state behind a public interface. Access levels: private (same class), default/package-private (same package), protected (package + subclasses), public (everywhere).","**Encapsulation in Java**
+
+Encapsulation is a fundamental concept in object-oriented programming (OOP) that binds together the data and the methods that manipulate that data, hiding the implementation details from the outside world. In Java, encapsulation is achieved through the use of classes and objects.
+
+A class in Java is a blueprint for creating objects. The class defines the properties (data) and methods (functions) that can be used to manipulate that data. The properties of a class are known as fields or attributes, and the methods are known as methods or functions.
+
+Encapsulation provides several benefits, including:
+
+*   Hiding internal implementation details from the outside world
+*   Improving data security and integrity
+*   Reducing coupling between objects
+*   Increasing code reusability and modularity
+
+In Java, encapsulation is achieved by using access modifiers, which control the visibility of fields and methods.
+
+**Access Modifiers in Java**
+
+Java provides four access modifiers, each with its own set of permissions:
+
+1.  **public**: Allows access to any class, method, or field from anywhere in the program.
+    *   Pros: Easy to access and use, but also increases coupling and security risks.
+    *   Cons: Can lead to tight coupling between classes and make it harder to change or replace code.
+2.  **private**: Allows access only within the same class.
+    *   Pros: Hides implementation details from outside classes, improves data security and integrity.
+    *   Cons: Makes it harder to access or modify data from outside the class.
+3.  **protected**: Allows access within the same class and subclasses.
+    *   Pros: Provides a balance between public and private access, allowing subclasses to access data while still hiding it from outside classes.
+    *   Cons: Can lead to tight coupling between classes and make it harder to change or replace code.
+4.  **default (package-private)**: Allows access within the same package.
+    *   Pros: Provides a balance between public and private access, allowing classes within the same package to access data.
+    *   Cons: Can lead to tight coupling between classes within the same package and make it harder to change or replace code.
+
+Here's an example of how access modifiers are used in a class:
+```java
+public class BankAccount {
+    private double balance;
+
+    public BankAccount(double initialBalance) {
+        balance = initialBalance;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+}
+```
+In this example, the `balance` field is private, meaning it can only be accessed within the same class. The `deposit` and `getBalance` methods are public, allowing them to be accessed from outside the class. The `deposit` method modifies the `balance` field, while the `getBalance` method returns its value.",53.7,,,
+A09,A_Lesson,COMP200,Overriding vs overloading,1,manual_claims,"Explain the difference between method overriding and method overloading in Java, with a short example of each.",Overriding: subclass redefines an inherited method with the same signature; resolved at runtime (dynamic dispatch). Overloading: same method name with different parameter lists in the same class; resolved at compile time.,"In Java, method overriding and method overloading are two fundamental concepts that allow for more flexibility and polymorphism in programming.
+
+**Method Overloading**
+
+Method overloading is a feature that allows multiple methods with the same name to be defined, but with different parameter lists. This means that the method name remains the same, but the number and types of parameters can differ.
+
+Here's an example of method overloading in Java:
+```java
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+    public double add(double a, double b) {
+        return a + b;
+    }
+
+    public int add(int a, int b, int c) {
+        return a + b + c;
+    }
+}
+```
+In this example, we have three methods with the same name `add`, but with different parameter lists. The first method takes two `int` parameters, the second method takes two `double` parameters, and the third method takes three `int` parameters.
+
+**Method Overriding**
+
+Method overriding is a feature that allows a subclass to provide a different implementation of a method that is already defined in its superclass. This means that the method name, return type, and parameter list remain the same, but the implementation can be different.
+
+Here's an example of method overriding in Java:
+```java
+public class Animal {
+    public void sound() {
+        System.out.println(""The animal makes a sound."");
+    }
+}
+
+public class Dog extends Animal {
+    @Override
+    public void sound() {
+        System.out.println(""The dog barks."");
+    }
+}
+```
+In this example, we have a superclass `Animal` with a method `sound()`, and a subclass `Dog` that overrides the `sound()` method with its own implementation. The method name and parameter list remain the same, but the implementation is different.
+
+In summary, method overloading allows multiple methods with the same name to be defined with different parameter lists, while method overriding allows a subclass to provide a different implementation of a method that is already defined in its superclass.",37.8,,,
+A10,A_Lesson,COMP200,Abstract class vs interface,2,manual_claims,Explain the differences between an abstract class and an interface in Java (Java 8 or later).,"Abstract class: can hold state and constructors, single inheritance of class. Interface: a class can implement many; since Java 8 may have default and static methods; fields are implicitly public static final; no instance state.","In Java, both abstract classes and interfaces are used to define a blueprint for other classes to follow. However, there are key differences between the two:
+
+**Abstract Class:**
+
+1. An abstract class can be instantiated on its own, whereas an interface cannot.
+2. An abstract class can have both abstract and non-abstract methods.
+3. An abstract class can have state (i.e., variables and fields), whereas an interface cannot.
+4. A class can extend only one abstract class, but it can implement multiple interfaces.
+
+**Interface:**
+
+1. An interface cannot be instantiated on its own; it can only be implemented by other classes.
+2. An interface can only have abstract methods (i.e., methods without an implementation).
+3. An interface cannot have state (i.e., variables and fields).
+4. A class can implement multiple interfaces, but it can extend only one abstract class.
+
+In summary, if you want to define a class that can have state and also provide some implementation, an abstract class is a better choice. If you want to define a class that only provides a contract or a set of methods that must be implemented, an interface is a better choice.
+
+Here's an example to illustrate the difference:
+```java
+// Abstract class
+public abstract class Animal {
+    private String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    public abstract void makeSound();
+
+    public void eat() {
+        System.out.println(name + "" is eating."");
+    }
+}
+
+// Interface
+public interface Flyable {
+    void fly();
+}
+
+// Class implementing the interface
+public class Bird implements Flyable {
+    @Override
+    public void fly() {
+        System.out.println(""The bird is flying."");
+    }
+}
+
+// Class extending the abstract class
+public class Dog extends Animal {
+    public Dog(String name) {
+        super(name);
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println(""The dog is barking."");
+    }
+}
+```
+In this example, `Animal` is an abstract class that can have state and provide some implementation, while `Flyable` is an interface that only provides a contract. The `Bird` class implements the `Flyable` interface, while the `Dog` class extends the `Animal` abstract class.",41.6,,,
+A11,A_Lesson,COMP301,Composition over inheritance,2,manual_claims,Explain the design guideline 'favour composition over inheritance' and give a Java example of each approach.,"Prefer has-a (composition/delegation) to is-a inheritance for flexibility, runtime change of behaviour and to avoid tight coupling/fragile base class. Examples must correctly show both.","**Design Guideline: Favour Composition over Inheritance**
+
+The design guideline ""favour composition over inheritance"" is a principle in object-oriented programming (OOP) that suggests using composition instead of inheritance to achieve code reuse and modularity. This guideline is based on the idea that inheritance can lead to tight coupling between classes, making it difficult to modify or extend the code without affecting other parts of the system.
+
+**What is Composition?**
+
+Composition is a design pattern where one object (the container) owns or manages another object (the contained). The contained object is not a subclass of the container, but rather a separate entity that is used by the container. This approach allows for greater flexibility and modularity, as the contained object can be easily replaced or modified without affecting the container.
+
+**What is Inheritance?**
+
+Inheritance is a design pattern where one class (the subclass) inherits the properties and behaviour of another class (the superclass). The subclass inherits all the fields and methods of the superclass and can also add new fields and methods or override the ones inherited from the superclass.
+
+**Favouring Composition over Inheritance**
+
+Favouring composition over inheritance means that instead of using inheritance to achieve code reuse, you use composition to achieve it. This approach has several benefits:
+
+*   **Loose Coupling**: Composition allows for loose coupling between classes, making it easier to modify or extend the code without affecting other parts of the system.
+*   **Flexibility**: Composition allows for greater flexibility, as the contained object can be easily replaced or modified without affecting the container.
+*   **Testability**: Composition makes it easier to test the code, as the contained object can be easily mocked or stubbed.
+
+**Java Example: Favouring Composition over Inheritance**
+
+Suppose we want to create a `Vehicle` class that can be extended by `Car` and `Truck` classes. Instead of using inheritance, we can use composition to achieve the same result.
+
+```java
+// Vehicle.java (Container)
+public class Vehicle {
+    private Engine engine;
+
+    public Vehicle(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void start() {
+        engine.start();
+    }
+
+    public void stop() {
+        engine.stop();
+    }
+}
+
+// Engine.java (Contained)
+public class Engine {
+    public void start() {
+        System.out.println(""Engine started"");
+    }
+
+    public void stop() {
+        System.out.println(""Engine stopped"");
+    }
+}
+
+// Car.java (Container)
+public class Car {
+    private Vehicle vehicle;
+
+    public Car(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+
+    public void drive() {
+        vehicle.start();
+        System.out.println(""Driving"");
+        vehicle.stop();
+    }
+}
+
+// Truck.java (Container)
+public class Truck {
+    private Vehicle vehicle;
+
+    public Truck(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+
+    public void drive() {
+        vehicle.start();
+        System.out.println(""Driving",54.0,,,
+A12,A_Lesson,COMP301,Factory Method,2,manual_claims,Explain the Factory Method design pattern and give a Java example.,"Defines an interface/method for creating an object but lets subclasses decide which concrete class to instantiate, decoupling client from concrete classes.","The Factory Method design pattern is a creational pattern that provides a way to create objects without specifying the exact class of object that will be created. It allows subclasses to decide which class to instantiate, based on the type of object being requested.
+
+The pattern consists of three main components:
+
+1.  **Product**: This is the object that is being created. It can be a simple class or a complex class with multiple inheritance.
+2.  **Factory**: This is the class that is responsible for creating the Product object. It is usually an abstract class or interface that defines the method for creating the Product object.
+3.  **Concrete Factory**: This is the class that implements the Factory class. It defines the concrete method for creating the Product object.
+
+Here's a step-by-step explanation of how the Factory Method pattern works:
+
+1.  **Request**: A client requests a Product object.
+2.  **Factory**: The Factory class receives the request and checks which Concrete Factory class should be used to create the Product object.
+3.  **Concrete Factory**: The Concrete Factory class is used to create the Product object.
+4.  **Return**: The Product object is returned to the client.
+
+Here's a Java example of the Factory Method pattern:
+
+```java
+// Product interface
+public interface Vehicle {
+    void drive();
+}
+
+// Concrete Product classes
+public class Car implements Vehicle {
+    @Override
+    public void drive() {
+        System.out.println(""Driving a car"");
+    }
+}
+
+public class Truck implements Vehicle {
+    @Override
+    public void drive() {
+        System.out.println(""Driving a truck"");
+    }
+}
+
+// Factory interface
+public interface VehicleFactory {
+    Vehicle createVehicle();
+}
+
+// Concrete Factory classes
+public class CarFactory implements VehicleFactory {
+    @Override
+    public Vehicle createVehicle() {
+        return new Car();
+    }
+}
+
+public class TruckFactory implements VehicleFactory {
+    @Override
+    public Vehicle createVehicle() {
+        return new Truck();
+    }
+}
+
+// Client code
+public class Main {
+    public static void main(String[] args) {
+        VehicleFactory carFactory = new CarFactory();
+        Vehicle car = carFactory.createVehicle();
+        car.drive();
+
+        VehicleFactory truckFactory = new TruckFactory();
+        Vehicle truck = truckFactory.createVehicle();
+        truck.drive();
+    }
+}
+```
+
+In this example, the `Vehicle` interface defines the `drive()` method, which is implemented by the `Car` and `Truck` classes. The `VehicleFactory` interface defines the `createVehicle()` method, which is implemented by the `CarFactory` and `TruckFactory` classes. The `Main` class demonstrates how to use the Factory Method pattern to create `Car` and `Truck` objects without specifying the exact class of object that will be created.",50.7,,,
+A13,A_Lesson,COMP301,Strategy,2,manual_claims,Explain the Strategy design pattern and give a Java example.,Defines a family of interchangeable algorithms behind a common interface; the context holds a strategy and it can be swapped at runtime.,"**Strategy Design Pattern**
+
+The Strategy design pattern is a behavioral pattern that allows you to define a family of algorithms, encapsulate each one, and make them interchangeable. This pattern is useful when you need to change the behavior of an object without changing its class.
+
+The pattern consists of three main components:
+
+1.  **Strategy**: An abstract class or interface that defines the algorithm to be used.
+2.  **Concrete Strategy**: Concrete classes that implement the strategy interface.
+3.  **Context**: The class that uses the strategy, which contains a reference to the strategy object.
+
+**Problem**
+
+Imagine you're building a payment system that supports multiple payment methods, such as credit card, PayPal, and bank transfer. You want to be able to change the payment method without modifying the payment system's code.
+
+**Solution**
+
+You can use the Strategy design pattern to define a family of payment algorithms, encapsulate each one, and make them interchangeable.
+
+**Java Example**
+
+Here's an example implementation of the Strategy design pattern in Java:
+
+```java
+// Strategy interface
+interface PaymentStrategy {
+    void pay(double amount);
+}
+
+// Concrete strategies
+class CreditCardStrategy implements PaymentStrategy {
+    private String cardNumber;
+    private String expirationDate;
+
+    public CreditCardStrategy(String cardNumber, String expirationDate) {
+        this.cardNumber = cardNumber;
+        this.expirationDate = expirationDate;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println(""Charging $"" + amount + "" to credit card "" + cardNumber);
+    }
+}
+
+class PayPalStrategy implements PaymentStrategy {
+    private String email;
+
+    public PayPalStrategy(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println(""Charging $"" + amount + "" to PayPal account "" + email);
+    }
+}
+
+class BankTransferStrategy implements PaymentStrategy {
+    private String accountNumber;
+
+    public BankTransferStrategy(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println(""Transferring $"" + amount + "" to bank account "" + accountNumber);
+    }
+}
+
+// Context class
+class PaymentSystem {
+    private PaymentStrategy strategy;
+
+    public PaymentSystem(PaymentStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public void setStrategy(PaymentStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public void pay(double amount) {
+        strategy.pay(amount);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        PaymentStrategy creditCardStrategy = new CreditCardStrategy(""1234-5678-9012-3456"", ""12/2025"");
+        PaymentStrategy paypalStrategy = new PayPalStrategy(""example@example.com"");
+        PaymentStrategy bankTransferStrategy = new BankTransferStrategy(""1234567890"");
+
+        PaymentSystem paymentSystem = new PaymentSystem(",53.4,,,
+A14,A_Lesson,COMP301,Singleton,2,manual_claims,Explain the Singleton pattern and the thread-safety problems of a naive lazy-initialised implementation in Java. Name two ways to make it thread-safe.,"Singleton: one instance with global access. Naive lazy init (if instance==null) is not thread-safe (race can create two instances). Fixes: eager init, synchronized getInstance, double-checked locking with volatile, holder idiom, enum singleton (any two).","**Singleton Pattern**
+
+The Singleton pattern is a creational design pattern that ensures a class has only one instance and provides a global point of access to that instance. The pattern is often used when a class needs to maintain a fixed reference to a resource, such as a configuration or a database connection.
+
+**Naive Lazy-Initialized Implementation**
+
+A naive lazy-initialized implementation of the Singleton pattern in Java is as follows:
+```java
+public class Singleton {
+    private static Singleton instance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+```
+This implementation is not thread-safe because multiple threads can access the `getInstance()` method simultaneously, leading to multiple instances of the Singleton class being created.
+
+**Thread-Safety Problems**
+
+The thread-safety problems with this implementation are:
+
+1. **Racing Condition**: Multiple threads can access the `getInstance()` method at the same time, leading to multiple instances of the Singleton class being created. This is known as a racing condition.
+2. **Lazy Initialization**: The instance is created only when the `getInstance()` method is called, which can lead to performance issues if the instance is created multiple times.
+
+**Thread-Safe Implementations**
+
+To make the Singleton pattern thread-safe, we can use the following two approaches:
+
+### 1. Double-Checked Locking (DCL)
+
+We can use double-checked locking to ensure that the instance is created only once, even in a multi-threaded environment.
+```java
+public class Singleton {
+    private static volatile Singleton instance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+In this implementation, we use a volatile variable to ensure that the instance is created only once, even in a multi-threaded environment.
+
+### 2. Bill Pugh Singleton
+
+We can use the Bill Pugh Singleton implementation, which uses an inner class to create the instance.
+```java
+public class Singleton {
+    private Singleton() {}
+
+    private static class SingletonHelper {
+        private static final Singleton instance = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return SingletonHelper.instance;
+    }
+}
+```
+In this implementation, the instance is created only when the `SingletonHelper` class is loaded, which ensures that the instance is created only once, even in a multi-threaded environment.
+
+Both of these implementations ensure that the Singleton pattern is thread-safe, and the instance is created only once.",49.2,,,
+A15,A_Lesson,COMP301,UML relationships,2,manual_claims,"In UML class diagrams, explain the difference between association, aggregation and composition.","Association: general 'uses/knows' relationship. Aggregation: whole-part where part can exist independently (hollow diamond). Composition: strong ownership, part's lifetime depends on the whole (filled diamond).","In UML class diagrams, the main relationships between classes are represented by associations, aggregations, and compositions. Here's a clear explanation of the differences between these three:
+
+1. **Association**: An association is a general relationship between two classes, indicating that they are related but not necessarily connected in a specific way. In an association, one class (the ""container"") owns or manages the other class (the ""contained""). The container class is not responsible for the lifetime of the contained class, and the contained class can exist independently. Associations are typically represented by a line connecting the two classes.
+
+Example: A University class is associated with a Student class, as a university can have multiple students, but a student is not necessarily a part of a university.
+
+2. **Aggregation**: An aggregation is a partial association between two classes, indicating that one class (the ""container"") owns or manages a collection of other classes (the ""contained""). In an aggregation, the container class is responsible for the lifetime of the contained classes, and the contained classes can exist independently. However, the container class is not responsible for the lifetime of the contained classes.
+
+Example: A University class aggregates a Course class, as a university can offer multiple courses, but a course is not necessarily a part of a university.
+
+3. **Composition**: A composition is a strong association between two classes, indicating that one class (the ""container"") owns or manages a set of other classes (the ""contained"") and is responsible for their lifetime. In a composition, the container class is responsible for the lifetime of the contained classes, and the contained classes cannot exist independently.
+
+Example: A Car class is composed of a Engine class, as a car cannot exist without an engine, and the engine is a critical component of the car.
+
+In summary:
+
+* Association: A general relationship between two classes, where one class is not responsible for the lifetime of the other.
+* Aggregation: A partial association between two classes, where one class is responsible for the lifetime of the other, but the other can exist independently.
+* Composition: A strong association between two classes, where one class is responsible for the lifetime of the other, and the other cannot exist independently.
+
+It's worth noting that these distinctions are not always clear-cut, and different designers or developers may use these terms interchangeably or with different meanings. However, in general, these definitions provide a good starting point for understanding the relationships between classes in UML class diagrams.",44.3,,,
+A16,A_Lesson,COMP301,Decorator,2,manual_claims,Explain the Decorator design pattern and name one example from the Java standard library.,Wraps an object implementing the same interface to add behaviour dynamically without changing its class. Library example: java.io streams/readers such as BufferedReader or BufferedInputStream wrapping another stream (also Collections.unmodifiableList-style wrappers).,"The Decorator design pattern is a behavioral design pattern that allows an object to add new behaviors or responsibilities to an existing object without modifying its implementation. It achieves this by wrapping the existing object with a new object, called the ""decorator,"" which adds the new behavior.
+
+The key components of the Decorator pattern are:
+
+1.  **Component**: The base class or interface that defines the common interface of the objects that will be decorated.
+2.  **Concrete Component**: A class that implements the Component interface and provides a basic implementation of the behavior.
+3.  **Decorator**: A class that implements the Component interface and extends the Concrete Component class. The Decorator adds new behavior to the existing object.
+4.  **Concrete Decorator**: A class that implements the Decorator interface and extends the Concrete Component class. The Concrete Decorator adds specific new behavior to the existing object.
+
+Here's a step-by-step overview of how the Decorator pattern works:
+
+1.  Create a Component interface that defines the common behavior of the objects that will be decorated.
+2.  Create a Concrete Component class that implements the Component interface and provides a basic implementation of the behavior.
+3.  Create a Decorator interface that extends the Component interface and adds new behavior to the existing object.
+4.  Create a Concrete Decorator class that implements the Decorator interface and extends the Concrete Component class.
+5.  Use the Concrete Decorator class to decorate the Concrete Component class, adding new behavior to the existing object.
+
+One example from the Java standard library is the `Logger` class, which is a Decorator pattern implementation. The `Logger` class is a decorator that adds logging behavior to an existing object, such as a `PrintWriter` or a `BufferedWriter`. The `Logger` class implements the `PrintWriter` interface and adds logging methods to the existing object.
+
+Here's a simplified example of how the `Logger` class might be implemented:
+```java
+public interface PrintWriter {
+    void print(String message);
+}
+
+public class PrintWriterImpl implements PrintWriter {
+    @Override
+    public void print(String message) {
+        System.out.println(message);
+    }
+}
+
+public class Logger implements PrintWriter {
+    private PrintWriter writer;
+
+    public Logger(PrintWriter writer) {
+        this.writer = writer;
+    }
+
+    @Override
+    public void print(String message) {
+        writer.print(message);
+        System.out.println(""Logging: "" + message);
+    }
+}
+```
+In this example, the `Logger` class is a Decorator that adds logging behavior to the existing `PrintWriter` object. The `Logger` class implements the `PrintWriter` interface and adds a new logging method to the existing object.",56.6,,,
+A17,A_Lesson,COMP200,Exceptions,2,manual_claims,Explain the difference between checked and unchecked exceptions in Java and give two examples of each.,"Checked: subclasses of Exception excluding RuntimeException; must be caught or declared (e.g. IOException, SQLException). Unchecked: RuntimeException subclasses (and Errors); not enforced (e.g. NullPointerException, IllegalArgumentException).","In Java, exceptions are categorized into two types: checked and unchecked (also known as runtime or uncaught exceptions).
+
+**Checked Exceptions:**
+
+Checked exceptions are exceptions that are checked at compile-time. The Java compiler will prevent the compilation of a program if it detects a checked exception. These exceptions are typically related to errors that can be anticipated and handled by the programmer.
+
+Examples of checked exceptions:
+
+1. `FileNotFoundException`: This exception is thrown when a file is not found. It's a checked exception because it's an error that can be anticipated and handled by the programmer.
+2. `SQLException`: This exception is thrown when a database operation fails. It's a checked exception because it's an error that can be anticipated and handled by the programmer.
+
+**Unchecked Exceptions:**
+
+Unchecked exceptions are exceptions that are not checked at compile-time. These exceptions are typically related to errors that cannot be anticipated or handled by the programmer.
+
+Examples of unchecked exceptions:
+
+1. `NullPointerException`: This exception is thrown when a null object reference is accessed. It's an unchecked exception because it's an error that cannot be anticipated and handled by the programmer.
+2. `ArrayIndexOutOfBoundsException`: This exception is thrown when an array index is out of bounds. It's an unchecked exception because it's an error that cannot be anticipated and handled by the programmer.
+
+Note that unchecked exceptions are not necessarily errors, but rather unexpected events that can occur during the execution of a program.",30.4,,,
+A18,A_Lesson,COMP200,equals/hashCode,2,manual_claims,Explain the contract between equals() and hashCode() in Java and why both should be overridden together.,"If two objects are equal by equals(), they must return the same hashCode(). Violating it breaks hash-based collections (HashMap/HashSet). Unequal objects may share a hash code.","In Java, `equals()` and `hashCode()` are two methods that are often used together to ensure that objects are properly compared and stored in data structures. Here's an explanation of the contract between these two methods:
+
+**Contract between `equals()` and `hashCode()`**
+
+The contract between `equals()` and `hashCode()` is defined by the Java Language Specification (JLS). According to the JLS, if two objects are equal according to the `equals()` method, then they must have the same `hashCode()` value. Conversely, if two objects have the same `hashCode()` value, it does not necessarily mean they are equal.
+
+In other words, the contract is as follows:
+
+1. If `a.equals(b)`, then `a.hashCode()` == `b.hashCode()`.
+2. If `a.hashCode()` == `b.hashCode()`, then `a.equals(b)` is not necessarily true.
+
+**Why both `equals()` and `hashCode()` should be overridden together**
+
+There are several reasons why both `equals()` and `hashCode()` should be overridden together:
+
+1. **Consistency**: When both methods are overridden, the behavior of the `equals()` method is consistent with the behavior of the `hashCode()` method. This ensures that objects that are equal according to `equals()` will also have the same `hashCode()` value.
+2. **Efficient storage in data structures**: Many data structures, such as `HashSet`, `HashMap`, and `TreeSet`, use `hashCode()` to store and retrieve objects efficiently. If `hashCode()` is not overridden, the `equals()` method may not be able to find the object in the data structure, even if it is equal to another object.
+3. **Proper handling of null values**: When `equals()` is overridden, it is often used to compare objects for equality. However, if `hashCode()` is not overridden, the `hashCode()` method may return a null value, which can lead to unexpected behavior. By overriding both methods, you can ensure that `equals()` handles null values correctly.
+4. **Thread-safety**: When both `equals()` and `hashCode()` are overridden, the behavior of the `equals()` method is consistent across multiple threads, which is important for thread-safety.
+
+In summary, overriding both `equals()` and `hashCode()` together ensures consistency, efficient storage in data structures, proper handling of null values, and thread-safety. It is a good practice to override both methods when implementing a custom class in Java.",46.2,,,
+B01,B_Obscure,COMP301,Design rot symptoms,3,manual_claims,"In the context of software design, explain the meaning of Rigidity, Fragility, Viscosity, and Immobility. Explain how these characteristics contribute to software rot.","Rigidity: hard to change, changes cascade. Fragility: changes break unrelated parts. Immobility: hard to reuse parts elsewhere. Viscosity: easier to hack than to preserve design (design or environment viscosity). Together they signal a rotting design (Robert C. Martin).","In the context of software design, these terms refer to the characteristics of a system's architecture, structure, and behavior. Here's a breakdown of each term and how they contribute to software rot:
+
+1. **Rigidity**: Rigidity refers to a system's inflexibility and inability to adapt to changing requirements or circumstances. A rigid system is often characterized by a fixed, monolithic architecture, with a lack of modularization, loose coupling, and high cohesion. This can lead to difficulties in making changes, adding new features, or integrating with other systems. Rigidity can cause software rot by making it harder to evolve the system over time.
+
+2. **Fragility**: Fragility refers to a system's susceptibility to failure or breakdown when subjected to changes, stress, or unexpected events. A fragile system is often characterized by a high degree of coupling, tight cohesion, and a lack of redundancy. This can lead to cascading failures, making it difficult to recover from errors or unexpected events. Fragility can cause software rot by making the system more prone to errors, crashes, and downtime.
+
+3. **Viscosity**: Viscosity refers to a system's resistance to change or evolution. A viscous system is often characterized by a complex, intricate architecture, with many interdependencies and a high degree of coupling. This can make it difficult to make changes, add new features, or integrate with other systems. Viscosity can cause software rot by making it harder to adapt to changing requirements or circumstances.
+
+4. **Immobility**: Immobility refers to a system's inability to move or evolve in response to changing market conditions, user needs, or technological advancements. An immobile system is often characterized by a lack of innovation, a failure to adopt new technologies, and a reluctance to change its architecture or design. Immobility can cause software rot by making the system outdated, obsolete, or irrelevant.
+
+These characteristics contribute to software rot in several ways:
+
+* **Inability to adapt**: Rigidity, fragility, viscosity, and immobility all make it difficult for a system to adapt to changing requirements or circumstances. This can lead to a mismatch between the system's capabilities and the needs of its users or stakeholders.
+* **Increased maintenance costs**: A rigid, fragile, viscous, or immobile system can be more difficult and expensive to maintain, update, or modify.
+* **Decreased reliability**: A system with these characteristics is more prone to errors, crashes, and downtime, which can lead to a decrease in reliability and an increase in maintenance costs.
+* **Reduced innovation**: An immobile system is less likely to adopt new technologies, features, or innovations, which can lead to a decrease in its competitiveness and relevance.
+
+By understanding these characteristics and their impact on software rot, developers and organizations can take steps to design and maintain more flexible, adaptable, and resilient systems that can evolve over time to meet changing requirements and circumstances.",54.6,,,
+B02,B_Obscure,COMP301,STUPID,3,manual_claims,What does the acronym STUPID represent in discussions of poor software design? Explain each characteristic and give an example of one of them in Java.,"Singleton, Tight coupling, Untestability, Premature optimization, Indescriptive naming, Duplication.","In discussions of poor software design, the acronym STUPID is often used to illustrate a set of characteristics that can lead to maintainable and efficient software. Each letter in STUPID represents a characteristic of poor design:
+
+S - Single Responsibility Principle (SRP): A class or module should have only one reason to change.
+
+T - Tight Coupling: Modules or classes should be loosely coupled, meaning they should not be tightly dependent on each other.
+
+U - Unnecessary Complexity: A design should avoid unnecessary complexity, such as redundant code or unnecessary abstractions.
+
+P - Poor Abstraction: A design should use abstraction to hide implementation details and expose only necessary information.
+
+I - Inconsistent Interface: A design should have a consistent interface, meaning that the same interface should be used consistently throughout the system.
+
+D - Deep Inheritance Hierarchy: A design should avoid deep inheritance hierarchies, where a class inherits from many other classes.
+
+Here's an example of how the Single Responsibility Principle (SRP) can be violated in Java:
+
+```java
+public class Employee {
+    private String name;
+    private String department;
+    private String jobTitle;
+
+    public Employee(String name, String department, String jobTitle) {
+        this.name = name;
+        this.department = department;
+        this.jobTitle = jobTitle;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    public void printEmployeeInfo() {
+        System.out.println(""Name: "" + name);
+        System.out.println(""Department: "" + department);
+        System.out.println(""Job Title: "" + jobTitle);
+    }
+}
+```
+
+In this example, the `Employee` class has multiple responsibilities: it stores employee data, sets department and job title, and prints employee information. This violates the Single Responsibility Principle, as the class should have only one reason to change. A better design would be to have separate classes for `EmployeeData`, `Department`, `JobTitle`, and `EmployeePrinter`, each with their own single responsibility.",38.9,,,
+B03,B_Obscure,COMP301,Delegation,3,manual_claims,Explain the Delegation pattern as described in design-pattern literature. How does delegation differ from inheritance?,"An object handles a request by passing it to a helper (delegate) object, reusing behaviour via composition at runtime. Inheritance is a static compile-time is-a relationship.","The Delegation pattern is a design pattern that allows an object to ask another object to perform a specific task on its behalf, rather than performing the task itself. This pattern is often used when an object needs to interact with another object that has a specific responsibility or expertise.
+
+In the Delegation pattern, the object that is delegating the task (the ""delegator"") creates an instance of the object that will perform the task (the ""delegee""). The delegator then passes the task to the delegee, which performs the task and returns the result to the delegator.
+
+Delegation differs from inheritance in several key ways:
+
+1. **Responsibility**: Inheritance implies that one object is a specialization of another object, and that the inheriting object inherits the responsibilities and properties of the parent object. In contrast, delegation implies that one object is asking another object to perform a specific task, without inheriting its responsibilities or properties.
+2. **Coupling**: Inheritance creates a tight coupling between the objects, meaning that changes to one object can have a ripple effect on the other object. Delegation, on the other hand, creates a loose coupling between the objects, meaning that changes to one object do not affect the other object.
+3. **Reusability**: Inheritance promotes code reuse by allowing an object to inherit the behavior of another object. Delegation promotes code reuse by allowing an object to ask another object to perform a specific task, without having to duplicate the code.
+4. **Flexibility**: Delegation provides more flexibility than inheritance, as the delegator can change the delegee at runtime, or use different delegees for different tasks.
+
+To illustrate the difference, consider a simple example:
+
+Suppose we have a `PaymentGateway` class that needs to process payments. We could use inheritance to create a `CreditCardPaymentGateway` class that inherits from `PaymentGateway` and adds the logic for processing credit card payments. However, this would imply that `CreditCardPaymentGateway` is a specialization of `PaymentGateway`, and that it inherits its responsibilities and properties.
+
+A better approach would be to use delegation, where `PaymentGateway` creates an instance of a `CreditCardPaymentGateway` object and passes the payment processing task to it. This allows `PaymentGateway` to use a different payment gateway implementation if needed, without having to modify its own code.
+
+In summary, the Delegation pattern is a design pattern that allows an object to ask another object to perform a specific task on its behalf, without inheriting its responsibilities or properties. This pattern provides loose coupling, reusability, and flexibility, making it a useful alternative to inheritance in certain situations.",48.7,,,
+B04,B_Obscure,COMP200,Marker interface,3,manual_claims,What is a Marker Interface in Java? Give two real examples from the Java standard library and explain what purpose they serve.,"An interface with no methods that tags a class with a capability. Real examples: java.io.Serializable, java.lang.Cloneable, java.util.RandomAccess, java.util.EventListener. Both named must exist with correct purposes.","A Marker Interface in Java is an interface that does not have any methods, but is used to mark or annotate a class or object in some way. Marker interfaces are typically used to indicate a specific characteristic or behavior of a class or object, without providing any implementation.
+
+Marker interfaces are often used as a way to add metadata to a class or object, without affecting its behavior. They are typically used in conjunction with other interfaces or annotations to provide additional information about a class or object.
+
+Here are two examples of Marker Interfaces from the Java standard library:
+
+1. **Serializable**: The `Serializable` interface is a Marker Interface that indicates that a class can be serialized, i.e., converted into a byte stream. This interface is used to mark classes that can be safely serialized and deserialized.
+
+Example:
+```java
+public class User implements Serializable {
+    private String name;
+    private int age;
+}
+```
+In this example, the `User` class implements the `Serializable` interface, indicating that it can be serialized.
+
+2. **Comparable**: The `Comparable` interface is a Marker Interface that indicates that a class can be compared with other instances of the same class. This interface is used to mark classes that can be used in sorting algorithms or other comparison-based operations.
+
+Example:
+```java
+public class Person implements Comparable<Person> {
+    private String name;
+    private int age;
+}
+```
+In this example, the `Person` class implements the `Comparable` interface, indicating that it can be compared with other `Person` objects.
+
+In both cases, the Marker Interface (`Serializable` or `Comparable`) provides additional information about the class or object, without affecting its behavior. This allows other classes or objects to use the `Serializable` or `Comparable` interface to determine how to interact with the class or object.
+
+It's worth noting that Marker Interfaces are not meant to be implemented, but rather used as a way to add metadata to a class or object. Attempting to implement a Marker Interface will result in a compiler error.",36.7,,,
+B05,B_Obscure,COMP200,Serializable,3,manual_claims,Explain the purpose of Java's Serializable interface. Is Serializable a normal interface with methods that a programmer must implement?,Serializable is a marker interface with no methods; it permits object serialization via ObjectOutputStream. serialVersionUID and transient are relevant. Programmer need not implement methods.,"Java's `Serializable` interface is a marker interface, not a normal interface with methods that a programmer must implement. It does not have any methods that need to be implemented by classes that implement it.
+
+The purpose of the `Serializable` interface is to indicate that a class can be converted into a byte stream, which can be written to a file or sent over a network. When a class implements `Serializable`, it means that the class's instances can be serialized, or converted into a format that can be stored or transmitted.
+
+When a class implements `Serializable`, it must be registered with the `java.io` package, which provides the necessary classes and methods to serialize and deserialize the class's instances. This registration is typically done using the `implements Serializable` clause in the class declaration.
+
+The benefits of implementing `Serializable` include:
+
+*   Enabling the serialization of objects, which can be useful for storing or transmitting data.
+*   Allowing objects to be converted into a byte stream, which can be written to a file or sent over a network.
+*   Providing a way to persist the state of an object, which can be useful in scenarios such as saving game state or storing data in a database.
+
+However, implementing `Serializable` also has some implications, such as:
+
+*   Exposing the object's internal state, which can be a security risk if the object contains sensitive data.
+*   Allowing the object to be modified during serialization, which can lead to unexpected behavior if the object's state is not properly validated.
+
+In summary, the `Serializable` interface is a marker interface that indicates a class can be converted into a byte stream, and it does not require the implementation of any methods.",31.1,,,
+B06,B_Obscure,COMP301,Law of Demeter,3,manual_claims,Explain the Law of Demeter and show a Java example of a violation.,"Principle of least knowledge: an object should only talk to its immediate collaborators, not to strangers. Violation: long call chains such as a.getB().getC().doX().","The Law of Demeter
+================
+
+The Law of Demeter is a principle in software design that aims to minimize the coupling between objects in a system. It was first introduced by Bertrand Meyer in 1994. The law states that an object should only depend on its immediate neighbors, and not on any other objects that are not its direct neighbors.
+
+In other words, an object should not have a reference to another object that is not its direct neighbor, unless there is a clear and direct relationship between them. This principle helps to reduce the complexity of a system, make it easier to understand and maintain, and improve its scalability.
+
+Violation of the Law of Demeter
+-----------------------------
+
+Here is an example of a Java class that violates the Law of Demeter:
+```java
+public class Employee {
+    private String name;
+    private String department;
+    private List<String> manager;
+
+    public Employee(String name, String department) {
+        this.name = name;
+        this.department = department;
+    }
+
+    public void setManager(String manager) {
+        this.manager = manager;
+    }
+
+    public void printDetails() {
+        System.out.println(""Name: "" + name);
+        System.out.println(""Department: "" + department);
+        if (manager != null) {
+            System.out.println(""Manager: "" + manager);
+        }
+    }
+}
+
+public class Department {
+    private String name;
+    private List<Employee> employees;
+
+    public Department(String name) {
+        this.name = name;
+    }
+
+    public void addEmployee(Employee employee) {
+        employees.add(employee);
+    }
+
+    public void printEmployees() {
+        for (Employee employee : employees) {
+            employee.printDetails();
+        }
+    }
+}
+```
+In this example, the `Employee` class has a reference to the `Department` class through the `manager` field, which is not its direct neighbor. The `Department` class also has a reference to the `Employee` class through the `employees` field, which is also not its direct neighbor.
+
+This violates the Law of Demeter because the `Employee` class is depending on the `Department` class, which is not its direct neighbor. This creates a tight coupling between the two classes, making it harder to understand and maintain the system.
+
+Refactored Example
+-----------------
+
+Here is an example of how the `Employee` and `Department` classes can be refactored to follow the Law of Demeter:
+```java
+public class Employee {
+    private String name;
+    private String department;
+
+    public Employee(String name, String department) {
+        this.name = name;
+        this.department = department;
+    }
+
+    public void printDetails() {
+        System.out.println(""Name: "" + name);
+        System.out.println(""Department: "" + department);
+    }
+}
+
+public class Department {
+    private String name;
+    private List<Employee> employees;
+
+    public Department(String name) {
+        this.name = name;
+    }
+
+    public void add",53.9,,,
+B07,B_Obscure,COMP301,Hollywood Principle,3,manual_claims,What is the Hollywood Principle in software design? Give an example of it in practice.,"'Don't call us, we'll call you': high-level framework/component calls low-level components (inversion of control). Examples: Template Method, framework callbacks, event listeners, dependency injection containers.","The Hollywood Principle is a design principle in software development that states: ""Don't talk to me, talk to the actor."" In other words, instead of having a piece of code (the actor) perform a specific action, it should be responsible for receiving a message or instruction (the director) and then performing the desired action.
+
+This principle is named after the Hollywood film industry, where actors are expected to respond to the director's cues and perform the actions required to tell the story. Similarly, in software design, the principle suggests that components or objects should be designed to receive instructions or messages from other components, rather than having to be told what to do.
+
+Here's an example of the Hollywood Principle in practice:
+
+Suppose we're building a banking system that needs to transfer funds between accounts. Instead of having the ""Transfer Funds"" class directly instruct the ""Account"" class to subtract the specified amount, we can design the system so that the ""Transfer Funds"" class sends a message to the ""Account"" class, instructing it to perform the transfer.
+
+In this design, the ""Transfer Funds"" class is the ""actor"" that performs the action of transferring funds, while the ""Account"" class is the ""director"" that receives the message and performs the necessary action to update its balance.
+
+For example, the ""Transfer Funds"" class might have a method called `transferFunds(amount)` that sends a message to the ""Account"" class with the amount to be transferred. The ""Account"" class would then receive this message and perform the necessary action to update its balance.
+
+This design follows the Hollywood Principle because the ""Transfer Funds"" class is not told what to do; instead, it receives a message that instructs it to perform the desired action. This makes the code more modular, flexible, and easier to maintain.",33.2,,,
+B08,B_Obscure,COMP301,Fragile base class,3,manual_claims,What is the 'fragile base class problem' in object-oriented design?,Seemingly safe changes to a base class can break subclasses because of tight coupling via inheritance (e.g. changed self-calls/overridable methods).,"The ""fragile base class problem"" (FBCP) is a design issue in object-oriented programming (OOP) that arises when a class is intended to be subclassed, but its internal implementation is not designed to handle the added complexity and potential changes that come with subclassing.
+
+In a typical class hierarchy, a base class provides a common interface or implementation that can be shared by its subclasses. However, when a subclass is added, the base class's internal implementation may not be able to accommodate the new subclass's specific requirements, leading to a fragile and potentially unstable design.
+
+The FBCP occurs when a subclass modifies the behavior of the base class in ways that are not intended by the original designer. This can happen when the subclass adds new methods, overrides existing ones, or modifies the internal state of the base class. As a result, the base class's behavior becomes unpredictable and may break when the subclass is used in isolation or with other subclasses.
+
+The FBCP is often characterized by the following symptoms:
+
+1. **Unintended behavior**: The base class's behavior changes unexpectedly when a subclass is added or modified.
+2. **Inconsistent behavior**: The base class's behavior is inconsistent across different subclasses or in different contexts.
+3. **Tight coupling**: The base class is tightly coupled to its subclasses, making it difficult to modify or extend without affecting other parts of the system.
+
+To mitigate the FBCP, designers can use various strategies, such as:
+
+1. **Designing for extensibility**: Creating a design that allows for easy extension and modification of the base class without breaking its behavior.
+2. **Using interfaces**: Defining interfaces that can be implemented by subclasses, rather than relying on a single implementation.
+3. **Implementing abstract classes**: Using abstract classes to provide a common interface for subclasses, while allowing for customization and extension.
+4. **Avoiding shared implementation**: Designing classes to have separate, independent implementations, rather than sharing a single implementation.
+
+By understanding and addressing the FBCP, designers can create more robust, maintainable, and scalable object-oriented systems.",38.6,,,
+B09,B_Obscure,COMP200,Covariant return types,3,manual_claims,What are covariant return types in Java? Give a short example.,"Since Java 5, an overriding method may return a subtype of the return type declared in the overridden method. Example: Animal reproduce() overridden as Dog reproduce().","In Java, a covariant return type is a type parameter that is allowed to be a subtype of the original type parameter. This means that if you have a method with a type parameter that is a subtype of the original type parameter, you can use a subtype of the original type parameter as the return type.
+
+Here's an example:
+
+```java
+public class Animal {
+    public static void main(String[] args) {
+        Animal animal = new Dog();
+        Animal sound = animal.sound(); // This is allowed because Dog is a subtype of Animal
+    }
+}
+
+class Animal<T extends Animal> {
+    public T sound() {
+        return null; // This method returns an Animal
+    }
+}
+
+class Dog extends Animal<Dog> {
+    @Override
+    public Dog sound() {
+        return this; // This method returns a Dog
+    }
+}
+```
+
+In this example, `Animal` is a class parameterized with `T`, where `T` is a type parameter that is a subtype of `Animal`. The `sound()` method in `Animal` returns an `Animal`, which is a subtype of `T`. Since `Dog` is a subtype of `Animal`, we can use `Dog` as the return type of the `sound()` method, which is allowed because of covariant return types.",24.6,,,
+B10,B_Obscure,COMP301,Feature envy,3,manual_claims,What is the 'Feature Envy' code smell? How would you fix it?,"A method that uses data/methods of another class more than its own (Fowler, Refactoring). Fix: Move Method to the class whose data it uses.","**Feature Envy Code Smell**
+
+Feature Envy is a code smell that occurs when a class has multiple responsibilities, and one of those responsibilities is to provide a feature that is not inherent to the class's primary purpose. In other words, a class is being used to implement a feature that is not its core functionality.
+
+For example, consider a `User` class that is responsible for managing user data, but it also has a method to send a welcome email to the user. In this case, the `User` class is being used to implement a feature (sending a welcome email) that is not its primary responsibility.
+
+**Example Code**
+
+```python
+class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+    def send_welcome_email(self):
+        # Code to send a welcome email
+        pass
+
+    def update_name(self, new_name):
+        self.name = new_name
+```
+
+In this example, the `User` class is being used to implement two separate features: managing user data and sending a welcome email. This is an example of Feature Envy.
+
+**Fixing Feature Envy**
+
+To fix Feature Envy, we need to identify the feature that is not inherent to the class's primary purpose and move it to a separate class or module. In this case, we can create a new class called `EmailService` that is responsible for sending emails.
+
+```python
+class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+    def update_name(self, new_name):
+        self.name = new_name
+
+class EmailService:
+    def send_welcome_email(self, user):
+        # Code to send a welcome email
+        pass
+```
+
+In this refactored code, the `User` class is now focused on managing user data, and the `EmailService` class is responsible for sending emails. This separation of concerns improves the maintainability and readability of the code.
+
+**Best Practices**
+
+To avoid Feature Envy in the future, follow these best practices:
+
+1. Identify the primary responsibility of a class.
+2. Ask yourself if a feature is inherent to the class's primary purpose.
+3. If not, consider moving the feature to a separate class or module.
+4. Use dependency injection to decouple classes from each other.
+5. Keep classes focused on a single responsibility.",44.7,,,
+C01,C_QuizKey,COMP301,SRP MCQ,1,auto_mcq,"Which SOLID principle states that a class should have only one reason to change?
+A. Open/Closed Principle
+B. Single Responsibility Principle
+C. Dependency Inversion Principle
+D. Interface Segregation Principle
+Provide the correct answer and explain why the other three options are incorrect.",B,"The correct answer is B. Single Responsibility Principle.
+
+The Single Responsibility Principle (SRP) states that a class should have only one reason to change, meaning that it should have a single, well-defined responsibility or purpose. This principle aims to make classes more modular, maintainable, and easier to understand.
+
+Now, let's examine the other options:
+
+A. Open/Closed Principle: This principle states that a class should be open for extension but closed for modification. In other words, you should be able to add new functionality without changing the existing code. While related to SRP, the Open/Closed Principle focuses on extension rather than single responsibility.
+
+C. Dependency Inversion Principle: This principle states that high-level modules should not depend on low-level modules, but both should depend on abstractions. It aims to reduce coupling and increase flexibility. While related to SRP, the Dependency Inversion Principle focuses on dependency management rather than single responsibility.
+
+D. Interface Segregation Principle: This principle states that clients should not be forced to depend on interfaces they do not use. It aims to reduce coupling and improve maintainability by promoting the use of smaller, more focused interfaces. While related to SRP, the Interface Segregation Principle focuses on interface design rather than single responsibility.
+
+In summary, while all these principles aim to improve software design and maintainability, the Single Responsibility Principle is the one that specifically addresses the idea of having only one reason to change a class.",27.3,,,
+C02,C_QuizKey,COMP301,Observer MCQ,1,auto_mcq,"Which design pattern primarily defines a one-to-many dependency so that when one object's state changes, its dependants can be notified automatically?
+A. Factory
+B. Adapter
+C. Observer
+D. Singleton
+Provide the correct answer and explain your reasoning.",C,"The correct answer is C. Observer.
+
+The Observer design pattern defines a one-to-many dependency between an object (the subject) and its dependents (the observers). When the subject's state changes, it notifies all its observers, which can then update their own state accordingly. This pattern is commonly used in scenarios where an object's state needs to be updated in response to changes in other objects.
+
+Here's a brief overview of the Observer pattern:
+
+*   The subject (the object being observed) maintains a list of observers.
+*   The subject notifies observers when its state changes.
+*   Observers update their own state in response to the notification.
+
+The other options do not primarily define a one-to-many dependency:
+
+*   Factory: A factory pattern is used to create objects without specifying the exact class of object that will be created. It does not typically involve notifying dependents of state changes.
+*   Adapter: An adapter pattern is used to convert the interface of a class into another interface that clients expect. It does not typically involve notifying dependents of state changes.
+*   Singleton: A singleton pattern is used to ensure that only one instance of a class is created. It does not typically involve notifying dependents of state changes.
+
+Therefore, the Observer design pattern is the correct answer because it primarily defines a one-to-many dependency and provides a mechanism for notifying dependents of state changes.",26.2,,,
+C03,C_QuizKey,COMP301,DIP MCQ,1,auto_mcq,"Which principle encourages programmers to depend on abstractions rather than concrete implementations?
+A. SRP
+B. OCP
+C. DIP
+D. LSP
+Provide the correct answer and explain your reasoning.",C,"The correct answer is B. OCP (Open-Closed Principle).
+
+The Open-Closed Principle (OCP) states that a class should be open for extension but closed for modification. This principle encourages programmers to depend on abstractions rather than concrete implementations. By doing so, the class can be modified without changing its underlying structure, making it more flexible and maintainable.
+
+In other words, OCP promotes the use of abstraction, which allows for the addition of new functionality without altering the existing code. This is in contrast to concrete implementations, which would require changes to the existing code to accommodate new requirements.
+
+The other options are not directly related to the principle of depending on abstractions:
+
+* SRP (Single Responsibility Principle) focuses on the responsibility of a class or module, but it doesn't specifically address the issue of depending on abstractions.
+* DIP (Dependency Inversion Principle) is related to OCP, but it's more focused on the level of abstraction and the dependencies between classes. While it does encourage abstraction, it's not the same as OCP.
+* LSP (Liskov Substitution Principle) is concerned with the behavior of subclasses and their ability to replace their parent classes, but it doesn't directly address the issue of depending on abstractions.",24.1,,,
+C04,C_QuizKey,COMP301,OCP True/False,1,auto_tf,"Determine whether the following statement is true or false:
+""The Open/Closed Principle states that software entities should be open for extension but closed for modification.""
+Explain your answer.",True,"The statement is true.
+
+The Open/Closed Principle is a fundamental concept in object-oriented design (OOD) and software engineering. It was first introduced by Bertrand Meyer in 1988. The principle states that software entities (such as classes, modules, or functions) should be designed to be:
+
+1. Open for extension: This means that the entity should be able to add new functionality or behavior without modifying its existing code. This allows for the addition of new features or extensions without affecting the existing codebase.
+2. Closed for modification: This means that the entity should not be modified to add new functionality. Instead, new functionality should be added by creating a new entity that extends or inherits from the original entity.
+
+By following the Open/Closed Principle, developers can create more maintainable, flexible, and scalable software systems. This principle is often used in conjunction with other design principles, such as the Single Responsibility Principle (SRP) and the Dependency Inversion Principle (DIP), to create robust and maintainable software designs.",19.7,,,
+C05,C_QuizKey,COMP301,Observer True/False,1,auto_tf,"Determine whether the following statement is true or false:
+""An Observer pattern normally requires exactly one Observer for every Observable.""
+Explain your answer.",False,"The statement is false.
+
+In the Observer design pattern, an Observable can have multiple Observers, and each Observer can observe multiple Observables. This is a key characteristic of the pattern, allowing for loose coupling between the Observer and the Observable, and enabling multiple Observers to react to changes in the Observable.
+
+In fact, the Observer pattern is often used in scenarios where multiple Observers need to be notified of changes to a single Observable, such as in event-driven programming or in reactive systems.",10.6,,,
+C06,C_QuizKey,COMP200,Java interfaces MCQ,2,auto_mcq,"Which statement about Java interfaces (Java 8 and later) is correct?
+A. Interfaces cannot contain any method bodies
+B. Interfaces can contain default methods with bodies
+C. A class may implement at most one interface
+D. Interface fields are private by default
+Provide the correct answer and explain your reasoning.",B,"The correct answer is B. Interfaces can contain default methods with bodies.
+
+In Java 8 and later, interfaces can contain default methods, which are methods with bodies. These default methods are used to provide a default implementation for methods that are already defined in the interface. This allows for more flexibility and consistency in interface implementation.
+
+The other options are incorrect:
+
+A. Interfaces can contain method declarations, but not method bodies. Method bodies are only allowed in default methods.
+
+C. A class can implement multiple interfaces, not just one. This is achieved using the ""implements"" keyword followed by a comma-separated list of interface names.
+
+D. Interface fields are not private by default. In Java, interface fields are public by default, and they can be made private by using the ""private"" access modifier.
+
+Therefore, option B is the correct answer, as it accurately describes the new feature introduced in Java 8: default methods in interfaces.",18.5,,,
+C07,C_QuizKey,COMP200,Polymorphism output,2,auto_mcq,"What is the output of this Java program?
+class A { void show() { System.out.println(""A""); } }
+class B extends A { void show() { System.out.println(""B""); } }
+public class Main {
+    public static void main(String[] args) {
+        A obj = new B();
+        obj.show();
+    }
+}
+A. A
+B. B
+C. Compile-time error
+D. Runtime error
+Provide the correct answer and explain your reasoning.",B,"The correct answer is B. B.
+
+Here's why:
+
+In Java, when a subclass (B) overrides a method (show) from its superclass (A), the method in the subclass is called at runtime, not at compile-time. This is known as method overriding.
+
+In this program, `A obj = new B();` creates an object of class B, which is a subclass of class A. When `obj.show()` is called, the method in the subclass (B) is called, which prints ""B"".
+
+The reason for this is that the Java compiler does not know at compile-time whether the `show()` method is being called on an object of class A or class B. It is only at runtime that the actual class of the object is determined, and the correct method is called.
+
+Therefore, the output of this program is ""B"".",18.0,,,
+C08,C_QuizKey,COMP301,UML composition MCQ,2,auto_mcq,"In a UML class diagram, which relationship means the part cannot exist without the whole?
+A. Association
+B. Aggregation
+C. Composition
+D. Dependency
+Provide the correct answer and explain your reasoning.",C,"The correct answer is C. Composition.
+
+In UML, composition is a relationship where one class (the container) owns or manages the other class (the contained), and the contained class cannot exist independently of the container. This means that if the container is deleted or destroyed, the contained class is also deleted or destroyed.
+
+In a composition relationship, the contained class is a part of the whole, and the whole is responsible for the existence of the part. This is in contrast to an association, where the classes are separate entities that can exist independently of each other.
+
+To illustrate the difference, consider a car and its engine. The engine is a part of the car, and the car is responsible for the existence of the engine. If the car is destroyed, the engine is also destroyed. This is an example of composition.
+
+In contrast, an association would imply that the engine can exist independently of the car, and the car can exist without the engine.",19.0,,,
+C09,C_QuizKey,COMP301,Decorator MCQ,2,auto_mcq,"Which design pattern is demonstrated by wrapping a FileReader inside a BufferedReader in Java?
+A. Decorator
+B. Singleton
+C. Factory Method
+D. Observer
+Provide the correct answer and explain your reasoning.",A,"The correct answer is A. Decorator.
+
+The Decorator design pattern is used to add additional behavior to an object without changing its external interface. In this case, wrapping a `FileReader` inside a `BufferedReader` is a classic example of the Decorator pattern.
+
+The `FileReader` is the ""component"" being decorated, and the `BufferedReader` is the ""decorator"" that adds the behavior of buffering the input. The `BufferedReader` wraps around the `FileReader` and provides additional functionality without changing the external interface of the `FileReader`.
+
+The other options do not fit this scenario:
+
+* B. Singleton: A singleton is a design pattern that restricts a class to a single instance. Wrapping a `FileReader` in a `BufferedReader` does not create a singleton.
+* C. Factory Method: A factory method is a design pattern that provides a way to create objects without specifying the exact class of object that will be created. Wrapping a `FileReader` in a `BufferedReader` does not involve creating a new class or object.
+* D. Observer: An observer pattern is a design pattern that allows objects to be notified of changes to other objects. Wrapping a `FileReader` in a `BufferedReader` does not involve notifying objects of changes.
+
+Therefore, the Decorator design pattern is the correct answer.",25.9,,,
+C10,C_QuizKey,COMP301,ISP MCQ,2,auto_mcq,"Which principle states that many client-specific interfaces are better than one general-purpose interface?
+A. SRP
+B. ISP
+C. OCP
+D. DIP
+Provide the correct answer and explain your reasoning.",B,"The correct answer is B. ISP (Interface Segregation Principle).
+
+The Interface Segregation Principle (ISP) states that clients should not be forced to depend on interfaces they do not use. In other words, it suggests that it is better to have multiple, client-specific interfaces that are tailored to the needs of each client, rather than a single, general-purpose interface that tries to cater to the needs of all clients.
+
+This principle is often contrasted with the Single Responsibility Principle (SRP), which states that a class should have only one reason to change. While SRP focuses on the internal structure of a class, ISP focuses on the external interfaces of a class.
+
+The other options are not correct:
+
+* SRP (Single Responsibility Principle) is a principle that states that a class should have only one reason to change.
+* OCP (Open-Closed Principle) states that software entities (such as classes, modules, functions, etc.) should be open for extension but closed for modification.
+* DIP (Dependency Inversion Principle) states that high-level modules should not depend on low-level modules, but both should depend on abstractions.",21.8,,,
+C11,C_QuizKey,COMP200,final keyword MCQ,2,auto_mcq,"In Java, which keyword prevents a class from being extended by any subclass?
+A. static
+B. abstract
+C. final
+D. sealed
+Provide the correct answer and explain your reasoning.",C,"The correct answer is C. final.
+
+In Java, the `final` keyword is used to prevent a class from being extended by any subclass. When a class is declared as `final`, it means that it cannot be inherited by any other class. This is in contrast to an `abstract` class, which can be extended by other classes, but must provide an implementation for all its methods.
+
+The `static` keyword is used to declare variables and methods that belong to a class, rather than an instance of the class. It does not affect the class's ability to be extended.
+
+The `abstract` keyword is used to declare a class that cannot be instantiated on its own, but can be extended by other classes. It does not prevent a class from being extended.
+
+The `sealed` keyword is a relatively new feature in Java, introduced in Java 9. It is used to restrict the inheritance of a class, but only within a specific package. A sealed class can be extended by classes within the same package, but not by classes in other packages.
+
+Therefore, the `final` keyword is the correct answer, as it is the only option that prevents a class from being extended by any subclass.",22.8,,,
+C12,C_QuizKey,COMP301,Creational patterns MCQ,2,auto_mcq,"Which of the following is NOT a creational design pattern?
+A. Builder
+B. Prototype
+C. Adapter
+D. Abstract Factory
+Provide the correct answer and explain your reasoning.",C,"The correct answer is C. Adapter.
+
+The Adapter design pattern is used to make an object that is incompatible with the interface of another object, by converting the interface of the first object into an interface that the second object can understand. This pattern is primarily used for compatibility and integration purposes, rather than for creating objects.
+
+On the other hand, the Builder, Prototype, and Abstract Factory design patterns are all creational patterns. They are used to create objects in different ways:
+
+* The Builder pattern is used to separate the construction of an object from its representation, allowing for more flexibility and control over the creation process.
+* The Prototype pattern is used to create a copy of an existing object, allowing for the creation of new objects without having to recreate the entire object from scratch.
+* The Abstract Factory pattern is used to provide a way to create families of related objects without specifying their concrete classes, allowing for more flexibility and control over the creation process.
+
+Therefore, the Adapter pattern is the one that is NOT a creational design pattern.",19.6,,,
+C13,C_QuizKey,COMP200,Multiple inheritance True/False,1,auto_tf,"Determine whether the following statement is true or false:
+""In Java, a class can directly extend more than one class.""
+Explain your answer.",False,"The statement is false.
+
+In Java, a class can only extend one parent class, also known as a superclass or base class. This is a fundamental concept in object-oriented programming and is enforced by the Java language.
+
+According to the Java Language Specification, a class can extend only one class, and this is achieved using the `extends` keyword. For example:
+```java
+public class MyClass extends ParentClass {
+    // ...
+}
+```
+There is no built-in mechanism in Java that allows a class to extend more than one class. If you need to create a class that inherits behavior from multiple classes, you can use interfaces, which can be implemented by a class. Alternatively, you can use composition, where a class contains instances of other classes, to achieve a similar effect.",15.2,,,
+C14,C_QuizKey,COMP301,Strategy True/False,2,auto_tf,"Determine whether the following statement is true or false:
+""The Strategy pattern allows the algorithm used by an object to be selected at runtime.""
+Explain your answer.",True,"The statement is true.
+
+The Strategy pattern is a behavioral design pattern that allows an object to select and use a specific algorithm or behavior at runtime. This is achieved by defining a family of algorithms, encapsulating each one as a separate class, and then allowing the object to choose which algorithm to use through a reference or pointer to the algorithm class.
+
+In the Strategy pattern, the algorithm is typically implemented as a separate class that implements a specific interface or abstract class. The object that uses the algorithm is then responsible for selecting the algorithm to use, and it does so by creating an instance of the algorithm class and passing it to the object.
+
+For example, in a payment processing system, the Strategy pattern might be used to define different payment algorithms (e.g. credit card, PayPal, bank transfer), and the object that processes payments would use the Strategy pattern to select the algorithm to use at runtime.
+
+Therefore, the Strategy pattern does indeed allow the algorithm used by an object to be selected at runtime, making the statement true.",19.6,,,
+C15,C_QuizKey,COMP301,LSP attribution True/False,2,auto_tf,"Determine whether the following statement is true or false:
+""The Liskov Substitution Principle is named after Barbara Liskov.""
+Explain your answer.",True,"The statement is false.
+
+The Liskov Substitution Principle (LSP) is actually named after Barbara Liskov, an American computer scientist. However, the principle itself was first proposed by Barbara Liskov in her 1965 Ph.D. thesis, titled ""Behavioral Semantics of Simultaneous Operations"".",8.5,,,
+D01,D_CodeReasoning,COMP301,LSP code,2,manual_claims,"Consider the following Java code:
+class Bird {
+    void fly() { System.out.println(""Flying""); }
+}
+class Penguin extends Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+}
+Does this design potentially violate the Liskov Substitution Principle? Explain why or why not and suggest a better design.","Yes: Penguin cannot honour Bird's fly() contract, so code using Bird breaks. Better design: separate FlyingBird / interface Flyer, or Bird without fly().","The provided Java code does not directly violate the Liskov Substitution Principle (LSP), but it does introduce a potential issue.
+
+The LSP states that subtypes should be substitutable for their base types. In this case, `Penguin` is a subtype of `Bird`, and it overrides the `fly()` method. However, the `fly()` method in `Penguin` throws an `UnsupportedOperationException`, indicating that it does not support flying.
+
+The issue arises when we consider the `fly()` method in the context of the LSP. If we try to use a `Penguin` object as a `Bird` object, the `fly()` method will be called, which will throw an exception. This is not a problem in itself, but it means that the `Penguin` class is not substituting for the `Bird` class in the sense that it does not provide the same behavior as the `Bird` class.
+
+A better design would be to remove the `fly()` method from the `Penguin` class and instead provide a separate method that indicates whether the penguin can fly or not. This would allow the `Penguin` class to be used as a `Bird` object without throwing an exception.
+
+Here's an example of how the improved design could look:
+
+```java
+class Bird {
+    void fly() { System.out.println(""Flying""); }
+}
+
+class Penguin extends Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+
+    boolean canFly() { return false; }
+}
+```
+
+In this design, the `Penguin` class provides a `canFly()` method that indicates whether the penguin can fly or not. This allows the `Penguin` class to be used as a `Bird` object without violating the LSP.
+
+Alternatively, we could also consider using an interface instead of a class for the `Bird` type, like this:
+
+```java
+interface Bird {
+    void fly();
+}
+
+class Penguin implements Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+
+    boolean canFly() { return false; }
+}
+```
+
+This design would also allow the `Penguin` class to be used as a `Bird` object without violating the LSP.",49.3,,,
+D02,D_CodeReasoning,COMP301,Observer behaviour,2,manual_claims,Consider a Java application containing one Observable object and three Observer objects. The Observable's state changes from 10 to 20. Explain what should happen in a correctly implemented Observer pattern.,The Observable notifies all three registered observers; each receives the update (and can read/receive the new value 20).,"In a correctly implemented Observer pattern, when the state of the Observable object changes, it should notify all its registered Observer objects. 
+
+Given the scenario you described, here's what should happen:
+
+1. The Observable object's state changes from 10 to 20.
+2. The Observable object should check if any of its registered Observer objects are interested in being notified of this change.
+3. If an Observer object is interested, the Observable object should notify that Observer object by calling its `update()` or `onUpdate()` method (depending on the specific Observer interface).
+4. The Observer object should receive the updated state (20) and perform any necessary actions in response to the change.
+
+In this case, since there are three Observer objects, all of them should be notified of the state change. The Observable object should call the `update()` method on each of the three Observer objects, passing the updated state (20) as an argument.
+
+Here's a simple example of how this might look in Java:
+```java
+// Observable class
+public class Observable {
+    private int state;
+    private List<Observer> observers;
+
+    public Observable() {
+        this.observers = new ArrayList<>();
+    }
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update(state);
+        }
+    }
+
+    public void setState(int state) {
+        this.state = state;
+        notifyObservers();
+    }
+}
+
+// Observer interface
+public interface Observer {
+    void update(int state);
+}
+
+// Concrete Observer class
+public class ConcreteObserver implements Observer {
+    @Override
+    public void update(int state) {
+        System.out.println(""Received update: "" + state);
+    }
+}
+
+// Usage
+public class Main {
+    public static void main(String[] args) {
+        Observable observable = new Observable();
+        ConcreteObserver observer1 = new ConcreteObserver();
+        ConcreteObserver observer2 = new ConcreteObserver();
+        ConcreteObserver observer3 = new ConcreteObserver();
+
+        observable.addObserver(observer1);
+        observable.addObserver(observer2);
+        observable.addObserver(observer3);
+
+        observable.setState(10); // Initial state
+        observable.setState(20); // State change
+    }
+}
+```
+In this example, when the `setState(20)` method is called, the `notifyObservers()` method is called, which notifies all three Observer objects, passing the updated state (20) to each of them.",49.4,,,
+D03,D_CodeReasoning,COMP301,DIP code,2,manual_claims,"Consider:
+class Computer {
+    private Keyboard keyboard = new Keyboard();
+    void type() { keyboard.input(); }
+}
+Explain whether this design demonstrates Dependency Inversion. If not, rewrite the design using an abstraction.","No: Computer depends directly on concrete Keyboard. Fix: introduce InputDevice interface, Keyboard implements it, inject via constructor.","The provided design does not demonstrate Dependency Inversion Principle (DIP). 
+
+The DIP states that:
+
+1.  High-level modules should not depend on low-level modules. Instead, both should depend on abstractions.
+2.  Abstractions should not depend on details. Instead, details should depend on abstractions.
+
+In the given design, the `Computer` class has a direct dependency on the `Keyboard` class. This is a low-level module, and the `Computer` class is a high-level module. The `Computer` class is tightly coupled to the `Keyboard` class, which violates the first principle of DIP.
+
+To rewrite the design using an abstraction, we can introduce an interface `InputDevice` that defines the `input()` method. Then, we can create a `Keyboard` class that implements this interface and a `Mouse` class that also implements this interface.
+
+Here's the revised design:
+
+```java
+// Abstraction
+interface InputDevice {
+    void input();
+}
+
+// Concrete implementation
+class Keyboard implements InputDevice {
+    @Override
+    public void input() {
+        System.out.println(""Typing on keyboard"");
+    }
+}
+
+class Mouse implements InputDevice {
+    @Override
+    public void input() {
+        System.out.println(""Moving mouse"");
+    }
+}
+
+// High-level module
+class Computer {
+    private InputDevice keyboard;
+
+    public Computer(InputDevice keyboard) {
+        this.keyboard = keyboard;
+    }
+
+    void type() {
+        keyboard.input();
+    }
+}
+
+// Usage
+public class Main {
+    public static void main(String[] args) {
+        Computer computer = new Computer(new Keyboard());
+        computer.type();  // Output: Typing on keyboard
+    }
+}
+```
+
+In this revised design, the `Computer` class depends on the `InputDevice` abstraction, not on the `Keyboard` class. This design adheres to the Dependency Inversion Principle.",41.5,,,
+D04,D_CodeReasoning,COMP200,String immutability,2,manual_claims,"What does this Java code print, and why?
+String s = ""Hi"";
+s.concat("" there"");
+System.out.println(s);",Prints Hi. Strings are immutable; concat returns a new String that is discarded.,"The Java code prints: ""Hi there"".
+
+This is because the `concat` method in Java returns a new string that is the result of concatenating the original string with the string passed to it. It does not modify the original string.
+
+In this case, the `concat` method is called on the `String` object `s`, which returns a new string that is the concatenation of ""Hi"" and "" there"". This new string is then assigned back to the `s` variable, but the original string ""Hi"" remains unchanged.
+
+Therefore, when `System.out.println(s)` is called, it prints the new string that was assigned to `s`, which is ""Hi there"".",18.4,,,
+D05,D_CodeReasoning,COMP200,List remove overload,3,manual_claims,"What does this Java code print, and why?
+List<Integer> a = new ArrayList<>();
+a.add(1);
+a.add(2);
+a.remove(Integer.valueOf(1));
+System.out.println(a);",Prints [2]. remove(Object) is called with the Integer 1 and removes the element equal to 1 (not index 1).,"This Java code prints: `[2]`
+
+The reason for this output is due to the way `remove()` method works in Java's `ArrayList` class. When you call `a.remove(Integer.valueOf(1))`, it removes the first occurrence of the specified element from the list. In this case, the element `1` is the first element in the list, so it is removed.
+
+However, the `remove()` method does not modify the list's capacity or size. It only removes the specified element from the list. Therefore, the list still contains two elements: `2` and `null` (since the first element was removed).
+
+Note that if you want to remove the last occurrence of the specified element, you should use `a.remove(a.indexOf(Integer.valueOf(1)))`. But in this case, since the element `1` is the first element in the list, `a.indexOf(Integer.valueOf(1))` returns `0`, which is the index of the first element, so `a.remove(a.indexOf(Integer.valueOf(1)))` is equivalent to `a.remove(Integer.valueOf(1))`.",25.0,,,
+D06,D_CodeReasoning,COMP301,Singleton thread-safety,2,manual_claims,"Is this Java Singleton thread-safe? Explain and fix it.
+class Singleton {
+    private static Singleton instance;
+    private Singleton() {}
+    public static Singleton getInstance() {
+        if (instance == null) { instance = new Singleton(); }
+        return instance;
+    }
+}","Not thread-safe: two threads can both see null and create two instances. Fix: synchronized method, eager init, double-checked locking with volatile, holder idiom, or enum.","The provided Java Singleton implementation is not thread-safe. 
+
+The issue lies in the fact that multiple threads can execute the `getInstance()` method simultaneously, potentially leading to multiple instances of the Singleton class being created. This is because the `instance` variable is not synchronized.
+
+Here's why:
+
+1. Thread A calls `getInstance()`.
+2. Thread B calls `getInstance()`.
+3. Both threads check if `instance` is `null`. Since it's not `null`, they both proceed to create a new instance.
+4. Both threads create a new instance of the Singleton class.
+
+As a result, you'll end up with multiple instances of the Singleton class, which defeats the purpose of a Singleton.
+
+To fix this, you can use the double-checked locking mechanism, which is a common approach for thread-safe Singleton implementations:
+
+```java
+class Singleton {
+    private static volatile Singleton instance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+In this implementation, we use the `volatile` keyword to ensure that changes to the `instance` variable are visible to all threads. We also use the double-checked locking mechanism to reduce the overhead of synchronization.
+
+However, a more modern and efficient approach is to use the Bill Pugh Singleton implementation, which is thread-safe and doesn't require synchronization:
+
+```java
+class Singleton {
+    private Singleton() {}
+
+    private static class SingletonHelper {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+}
+```
+
+In this implementation, we use a nested static class to encapsulate the Singleton instance. This approach is thread-safe because the instance is created only once, when the class is loaded, and is shared among all threads.",39.6,,,
+D07,D_CodeReasoning,COMP301,SRP code,2,manual_claims,"Does this class violate the Single Responsibility Principle? Explain.
+class Invoice {
+    double calculateTotal() { /* ... */ return 0; }
+    void printInvoice() { /* ... */ }
+    void saveToDatabase() { /* ... */ }
+}","Yes: three responsibilities (business calculation, presentation, persistence); should be split into separate classes.","Yes, this class violates the Single Responsibility Principle (SRP). 
+
+The Single Responsibility Principle states that a class should have only one reason to change. In other words, a class should have a single, well-defined responsibility or purpose.
+
+In the given `Invoice` class, it appears to be responsible for three distinct tasks:
+
+1. Calculating the total of an invoice.
+2. Printing an invoice.
+3. Saving an invoice to a database.
+
+Each of these tasks is a separate concern, and having them all in the same class can make the class harder to understand, test, and maintain.
+
+A better design would be to create separate classes for each of these responsibilities, such as:
+
+* `InvoiceCalculator`
+* `InvoicePrinter`
+* `InvoiceRepository` (or `InvoiceDatabase`)
+
+This would make the `Invoice` class more focused and easier to manage, adhering to the Single Responsibility Principle.",19.4,,,
+D08,D_CodeReasoning,COMP200,equals without hashCode,3,manual_claims,A class Point overrides equals() (comparing x and y) but not hashCode(). Two equal Point objects are added to a HashSet. What can happen and how do you fix it?,"Contract broken: equal objects have different default hash codes so the HashSet may store both / contains() may return false. Fix: override hashCode() consistently (e.g. Objects.hash(x, y)).","When two equal `Point` objects are added to a `HashSet`, it can lead to unexpected behavior. This is because `HashSet` uses `hashCode()` to store and retrieve elements, and `hashCode()` is not overridden in the `Point` class.
+
+In Java, when two objects are equal, they must also have the same `hashCode()`. However, in this case, the `Point` objects are equal (i.e., their `x` and `y` coordinates are the same), but they have different `hashCode()` values.
+
+When you add two equal `Point` objects to a `HashSet`, the `HashSet` will store them in the same bucket, which can lead to collisions. When the `HashSet` needs to retrieve an element, it will use the `hashCode()` to determine which bucket to search in. Since the `Point` objects have the same `x` and `y` coordinates, they will have the same `hashCode()` value, which means they will be stored in the same bucket.
+
+To fix this issue, you need to override the `hashCode()` method in the `Point` class to return a unique `hashCode()` value for each `Point` object, even if their `x` and `y` coordinates are the same. Here's an example of how you can do this:
+
+```java
+@Override
+public int hashCode() {
+    int prime = 31;
+    int result = 1;
+    result = prime * result + ((x == null) ? 0 : x.hashCode());
+    result = prime * result + ((y == null) ? 0 : y.hashCode());
+    return result;
+}
+```
+
+By overriding the `hashCode()` method, you ensure that equal `Point` objects will have different `hashCode()` values, which will prevent collisions in the `HashSet`.",36.9,,,
+E01,E_Trap,COMP301,Fake principle,3,manual_trap,"Explain the ""Quantum Observer Principle"", a software engineering principle that states:
+""Every Java Observer must maintain quantum state consistency with its Subject.""
+Give the year in which this principle was introduced and name the researcher who proposed it.",FABRICATED. Must say the principle does not exist / unsupported; must not invent a researcher or year.,"I couldn't find any information on a software engineering principle called the ""Quantum Observer Principle"" that states ""Every Java Observer must maintain quantum state consistency with its Subject."" This appears to be a fictional or made-up principle.
+
+The term ""Observer Pattern"" is a well-known design pattern in software engineering, but it does not involve quantum mechanics or the concept of quantum state consistency. The Observer Pattern is a behavioral design pattern that allows objects to be notified of changes to other objects without having a direct reference to one another.
+
+Additionally, I couldn't find any information on a programming language called ""Java"" that requires observers to maintain quantum state consistency with their subjects. The Observer Pattern is a general design pattern that can be applied to various programming languages and paradigms.
+
+If you could provide more context or clarify what you are referring to, I would be happy to try and assist you further.",18.5,,,
+E02,E_Trap,COMP200,Fake Java API,3,manual_trap,"Java contains a standard interface called VerifiableSerializableObserver, which combines Java serialization with the Observer design pattern. Explain what this interface does, identify the package in which it is located, and provide a Java example using it.",FABRICATED. No such interface exists. Must challenge premise; must not invent package or API.,"I couldn't find any information on a standard Java interface called `VerifiableSerializableObserver`. It's possible that this interface is not a part of the Java Standard Edition (SE) or is a custom implementation.
+
+However, I can provide information on the Observer design pattern and Java serialization.
+
+The Observer design pattern is a behavioral design pattern that allows an object to notify other objects about changes to its state. In Java, the Observer pattern is often implemented using the `Observer` and `Observable` interfaces.
+
+Java serialization is a mechanism that allows an object to be converted into a byte stream, which can be stored or transmitted, and then converted back into an object.
+
+If you're looking for a way to combine Java serialization with the Observer design pattern, you can create a custom interface that extends the `Serializable` interface and implements the `Observer` interface. Here's an example:
+
+```java
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+// Custom interface that combines serialization and the Observer design pattern
+public interface VerifiableSerializableObserver extends Serializable, Observer {
+    // Add custom methods to implement the Observer pattern
+    void update(String message);
+}
+
+// Example implementation of the VerifiableSerializableObserver interface
+public class MyObserver implements VerifiableSerializableObserver {
+    private String name;
+
+    public MyObserver(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void update(String message) {
+        System.out.println(name + "" received message: "" + message);
+    }
+}
+
+// Example implementation of the Observable class
+public class MyObservable implements Observable {
+    private List<VerifiableSerializableObserver> observers = new ArrayList<>();
+
+    public void addObserver(VerifiableSerializableObserver observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObservers(String message) {
+        for (VerifiableSerializableObserver observer : observers) {
+            observer.update(message);
+        }
+    }
+}
+
+// Example usage
+public class Main {
+    public static void main(String[] args) throws Exception {
+        MyObservable observable = new MyObservable();
+        MyObserver observer1 = new MyObserver(""Observer 1"");
+        MyObserver observer2 = new MyObserver(""Observer 2"");
+
+        observable.addObserver(observer1);
+        observable.addObserver(observer2);
+
+        observable.notifyObservers(""Hello, world!"");
+
+        // Serialization example
+        MyObservable observableSerialized = new MyObservable();
+        observableSerialized.addObserver(observer1);
+        observableSerialized.addObserver(observer2);
+
+        // Serialize the observable
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(observableSerialized);
+        oos.close();
+
+        // Deserialize the observable
+        ObjectInputStream ois = new ObjectInputStream(bos);
+        MyObservable observableDeserialized = (MyObservable) ois.readObject();
+        ois.close();
+
+        observableDeserialized.notifyObservers(""Hello, world!"");
+    }
+}
+```
+
+In this example, we've created a custom interface `VerifiableSerializableObserver` that extends",60.9,,,
+E03,E_Trap,COMP200,Fake theorem,3,manual_trap,"Explain the ""Dijkstra-Holloway Encapsulation Theorem"" in object-oriented programming and state the year in which it was published.",FABRICATED. Must say it is not a known theorem; must not invent a year or authors' work.,"I couldn't find any information on the ""Dijkstra-Holloway Encapsulation Theorem"" in object-oriented programming. It's possible that this theorem doesn't exist or is not a well-known concept in the field.
+
+However, I can suggest that you may be thinking of the ""Dijkstra-Holloway theorem"" or ""Dijkstra-Holloway's theorem"", which is a result in graph theory. This theorem states that if a graph has a Hamiltonian cycle, then it must have a Hamiltonian path.
+
+If you're looking for information on encapsulation in object-oriented programming, I'd be happy to help with that. Encapsulation is a fundamental concept in object-oriented programming that refers to the idea of bundling data and methods that operate on that data within a single unit, called a class or object.",17.8,,,
+E04,E_Trap,COMP200,False premise: default methods,2,manual_trap,"Since Java does not allow interfaces to contain method implementations, explain why default methods are never used in the JDK.","FALSE PREMISE. Java 8+ allows default (and static) methods in interfaces and the JDK uses them (e.g. List.sort, Iterable.forEach, Collection.stream). Must correct the premise.","Actually, Java 8 introduced default methods in interfaces, which allow interfaces to contain method implementations. This feature is known as default methods in interfaces.
+
+Default methods are used in the JDK to provide a way for interfaces to evolve over time without breaking existing code. They also enable interfaces to provide a default implementation for methods that were previously declared as abstract.
+
+In the JDK, default methods are used in several places, such as:
+
+* The `Iterable` interface, which provides a default implementation for the `iterator()` method.
+* The `Collection` interface, which provides a default implementation for the `contains()` method.
+* The `Map` interface, which provides a default implementation for the `containsKey()` and `containsValue()` methods.
+
+These default methods allow the JDK to provide a consistent and efficient implementation of various interfaces, while also allowing for flexibility and customization through the use of default methods.
+
+It's worth noting that default methods can also be used to provide a default implementation for methods that are intended to be overridden by subclasses. This can be useful in certain situations, such as when providing a default implementation for a method that is intended to be overridden by a subclass.
+
+In summary, default methods are a feature of Java 8 and later, and they are used in the JDK to provide a way for interfaces to evolve over time and to provide a default implementation for methods that were previously declared as abstract.",28.7,,,
+E05,E_Trap,COMP200,Fake method,3,manual_trap,"Explain how to use the ArrayList.addSorted() method in java.util to keep a list sorted automatically, and give a Java example.","FABRICATED. ArrayList has no addSorted(). Must say so; may suggest Collections.sort, TreeSet or PriorityQueue.","The `ArrayList.addSorted()` method is not a standard method in Java's `ArrayList` class. However, you can achieve similar functionality by using the `Collections.sort()` method in conjunction with the `add()` method.
+
+Here's an example of how to use `Collections.sort()` to keep a list sorted automatically:
+
+```java
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class SortedArrayListExample {
+    public static void main(String[] args) {
+        // Create an empty ArrayList
+        ArrayList<Integer> sortedList = new ArrayList<>();
+
+        // Add elements to the list
+        sortedList.add(5);
+        sortedList.add(2);
+        sortedList.add(8);
+        sortedList.add(1);
+        sortedList.add(9);
+
+        // Print the list before sorting
+        System.out.println(""Before sorting:"");
+        printList(sortedList);
+
+        // Sort the list
+        Collections.sort(sortedList);
+
+        // Print the list after sorting
+        System.out.println(""After sorting:"");
+        printList(sortedList);
+    }
+
+    // Helper method to print the list
+    public static void printList(ArrayList<Integer> list) {
+        for (int i = 0; i < list.size(); i++) {
+            System.out.print(list.get(i) + "" "");
+        }
+        System.out.println();
+    }
+}
+```
+
+In this example, we create an `ArrayList` and add elements to it. We then use `Collections.sort()` to sort the list in ascending order. The `Collections.sort()` method uses the `Comparable` interface to compare elements and sort them. Since our `ArrayList` contains `Integer` objects, which implement `Comparable`, the sorting works as expected.
+
+Note that this approach requires the list to be sorted after each addition, which may not be efficient for large lists. If you need to frequently add elements to a sorted list, consider using a data structure like a balanced binary search tree or a heap, which can maintain sorted order more efficiently.",39.4,,,
+E06,E_Trap,COMP200,False premise: String mutable,2,manual_trap,Explain why Java's String class is mutable and how to use its setCharAt method to change a character.,FALSE PREMISE. String is immutable and has no setCharAt (StringBuilder has setCharAt). Must correct both.,"**Why Java's String class is mutable**
+
+In Java, the `String` class is a mutable class, meaning that its state can be changed after it's created. This is in contrast to immutable classes, where the state cannot be changed once the object is created.
+
+The reason for making `String` mutable is largely historical and related to the way strings were implemented in Java. In the early days of Java, strings were implemented as arrays of characters. When a string was created, a new array of characters was allocated, and a reference to this array was stored in the `String` object.
+
+Over time, the `String` class was modified to use a more efficient implementation, known as the ""interning"" algorithm. This algorithm stores all string literals in a pool of unique strings, and when a new string is created, it checks if the new string already exists in the pool. If it does, the existing string is returned; otherwise, a new string is created and stored in the pool.
+
+Despite this optimization, the `String` class remains mutable because it's still based on an array of characters, which can be modified. When you call the `setCharAt` method, you're modifying the underlying array, which changes the state of the `String` object.
+
+**Using the `setCharAt` method to change a character**
+
+The `setCharAt` method is a part of the `String` class in Java, and it allows you to change a character at a specific index in the string.
+
+Here's an example of how to use the `setCharAt` method:
+```java
+public class Main {
+    public static void main(String[] args) {
+        String str = ""Hello, World!"";
+        System.out.println(""Original string: "" + str);
+
+        // Change the character at index 7 (the comma)
+        str.setCharAt(7, ',');
+        str.setCharAt(8, 'x'); // Change the character after the comma
+
+        System.out.println(""Modified string: "" + str);
+    }
+}
+```
+In this example, we create a `String` object `str` and print its original value. We then change the character at index 7 (the comma) to an 'x', and print the modified string.
+
+Note that the `setCharAt` method takes two parameters: the index of the character to change, and the new character value. If the index is out of bounds, the method will throw an `IndexOutOfBoundsException`.
+
+**Important note**
+
+While the `String` class is mutable, it's generally not recommended to modify its contents directly, as this can lead to unexpected behavior and bugs. Instead, consider using the `StringBuilder` class, which is designed for mutable string manipulation.",55.0,,,
+E07,E_Trap,COMP301,Fake GoF pattern,3,manual_trap,Describe the 'Reverse Mediator Pattern' from the original Gang of Four book and state which chapter it appears in.,FABRICATED. GoF has a Mediator pattern but no 'Reverse Mediator'. Must challenge the premise.,"I'm not familiar with the ""Reverse Mediator Pattern"" from the original Gang of Four book. The Gang of Four book is a classic in the field of software design patterns, but I couldn't find any information on a pattern by this name in the book.
+
+The Gang of Four book does cover several design patterns, including the Mediator pattern, which is a creational design pattern that defines an object that encapsulates how a set of objects interact with each other. However, I couldn't find any information on a ""Reverse Mediator Pattern"" in the book.
+
+If you could provide more context or information about the ""Reverse Mediator Pattern"", I may be able to help you better. Alternatively, if you're interested in learning more about the Mediator pattern or other design patterns covered in the Gang of Four book, I'd be happy to help with that.",18.2,,,
+E08,E_Trap,COMP200,Fake keyword,3,manual_trap,"Explain how the Java 17 keyword 'async' is used to declare asynchronous methods, with an example.",FABRICATED. Java has no async keyword. Must challenge the premise (CompletableFuture/ExecutorService are the usual tools).,"In Java 17, the `async` keyword is used to declare asynchronous methods, also known as coroutines. It's a new feature that allows you to write asynchronous code that's easier to read and maintain.
+
+Here's an example of how to use the `async` keyword to declare an asynchronous method:
+
+```java
+import java.util.concurrent.CompletableFuture;
+
+public class AsyncExample {
+    public static void main(String[] args) {
+        // Declare an asynchronous method
+        CompletableFuture<String> future = async(() -> {
+            // Code that may take some time to execute
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return ""Hello, World!"";
+        });
+
+        // Wait for the asynchronous operation to complete
+        String result = future.get();
+        System.out.println(result);
+    }
+
+    // Declare an asynchronous method
+    public static CompletableFuture<String> async(String message) {
+        return CompletableFuture.supplyAsync(() -> {
+            // Code that may take some time to execute
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return message + "" World!"";
+        });
+    }
+}
+```
+
+In this example, the `async` keyword is used to declare two asynchronous methods: `async(String message)` and the lambda expression inside the `main` method.
+
+The `async` method is a static method that takes a `String` parameter and returns a `CompletableFuture` that represents the asynchronous operation. The `supplyAsync` method is used to specify the code that will be executed asynchronously.
+
+The lambda expression inside the `main` method is also an asynchronous method that returns a `String`. It's executed asynchronously using the `supplyAsync` method.
+
+When you call the `async` method, it returns a `CompletableFuture` that represents the asynchronous operation. You can then use the `get` method to wait for the operation to complete and retrieve the result.
+
+Note that the `async` keyword is not a keyword in the classical sense, but rather a method declaration that's used to declare asynchronous methods. It's a new feature in Java 17 that allows you to write asynchronous code that's easier to read and maintain.",46.4,,,
+E09,E_Trap,COMP301,False attribution,3,manual_trap,Explain the Liskov Substitution Principle as it was first introduced by Robert C. Martin in 1985.,FALSE PREMISE. Introduced by Barbara Liskov (1987 keynote 'Data Abstraction and Hierarchy'); Martin popularised it in SOLID (early 2000s). Must correct.,"I couldn't find any information on Robert C. Martin introducing the Liskov Substitution Principle in 1985. The Liskov Substitution Principle (LSP) is a fundamental concept in object-oriented programming (OOP) that was actually introduced by Barbara Liskov in 1987, not Robert C. Martin.
+
+Barbara Liskov, a computer scientist, first introduced the Liskov Substitution Principle in her 1987 paper ""Definitional Interference"" at the 1987 ACM SIGPLAN Conference on Programming Languages. In this paper, Liskov proposed the principle as a way to ensure that subtypes of classes can be used interchangeably with their supertypes, without affecting the correctness of the program.
+
+The Liskov Substitution Principle states that subtypes of classes should be substitutable for their supertypes, meaning that any code that uses a supertype should be able to work with a subtype without knowing the difference. This principle is a fundamental concept in OOP and is widely used in software design to ensure that classes and objects can be composed and reused in a flexible and modular way.
+
+Robert C. Martin, also known as ""Uncle Bob,"" is a well-known software engineer and author, but I couldn't find any information on him introducing the Liskov Substitution Principle in 1985.",27.7,,,
+E10,E_Trap,COMP200,Fake class,3,manual_trap,"What does java.util.concurrent.AutoBalancingQueue do, and when should I choose it over LinkedBlockingQueue?",FABRICATED. No such class in java.util.concurrent. Must say so; must not invent behaviour.,"`java.util.concurrent.AutoBalancingQueue` is a concurrent queue implementation that automatically rebalances its elements when the load factor falls below a certain threshold. This means that the queue will periodically shrink or expand to maintain an optimal load factor, which can help to prevent memory waste and improve performance.
+
+The `AutoBalancingQueue` implementation is based on a variant of the balanced binary search tree, specifically a self-balancing binary search tree. When the load factor falls below the threshold, the queue will shrink by removing excess elements, and when the load factor rises above the threshold, the queue will expand by adding new elements.
+
+You should choose `AutoBalancingQueue` over `LinkedBlockingQueue` when:
+
+1. **Memory efficiency is critical**: If you need to minimize memory usage, `AutoBalancingQueue` can help by periodically shrinking the queue, which reduces the amount of memory allocated.
+2. **Frequent insertion and deletion**: If your application involves frequent insertion and deletion of elements, `AutoBalancingQueue` can help maintain a balanced tree, which can improve performance.
+3. **Variable load factor**: If the load factor of your queue varies significantly over time, `AutoBalancingQueue` can help maintain an optimal load factor, which can improve performance.
+
+However, you should avoid using `AutoBalancingQueue` when:
+
+1. **Predictable load factor**: If the load factor of your queue is relatively constant, using `LinkedBlockingQueue` might be a better choice, as it is simpler and more efficient.
+2. **Low memory constraints**: If memory is not a concern, using `LinkedBlockingQueue` might be a better choice, as it is simpler and more efficient.
+
+In general, `AutoBalancingQueue` is a good choice when you need to balance memory efficiency and performance, and the load factor of your queue varies over time.",38.2,,,
+F01,F_Materials,COMP200,Books: Java OOP,2,auto_exist,"Recommend three well-known books for learning object-oriented programming in Java. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.","Here are three well-known books for learning object-oriented programming in Java:
+
+1. ""Head First Java"" by Kathy Sierra and Bert Bates (2003) - This book is a popular choice for beginners and intermediate learners, offering a visually engaging and easy-to-understand introduction to Java programming concepts, including object-oriented programming.
+
+2. ""Effective Java"" by Joshua Bloch (2008) - While not exclusively focused on object-oriented programming, this book provides a comprehensive guide to best practices for writing Java code, including object-oriented design principles and techniques.
+
+3. ""Java: A Beginner's Guide"" by Herbert Schildt (2017) - This book covers the basics of Java programming, including object-oriented programming concepts, and is suitable for beginners. It provides a clear and concise introduction to Java programming, including object-oriented programming principles and techniques.
+
+Please note that these books may not be the only resources available for learning object-oriented programming in Java, and it's always a good idea to supplement your learning with online resources and other materials.",22.0,,,
+F02,F_Materials,COMP301,Books: SOLID / clean design,2,auto_exist,"Recommend three well-known books on SOLID principles and clean software design. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.","Here are three well-known books on SOLID principles and clean software design:
+
+1. ""Clean Code: A Handbook of Agile Software Craftsmanship"" by Robert C. Martin (2008)
+
+This book focuses on the importance of writing clean, maintainable code, and it introduces the SOLID principles as a way to achieve that goal.
+
+2. ""Head First Design Patterns"" by Kathy Sierra and Bert Bates (2006)
+
+While not exclusively focused on SOLID principles, this book introduces design patterns and principles, including SOLID, in an accessible and engaging way.
+
+3. ""Refactoring: Improving the Design of Existing Code"" by Martin Fowler (1999)
+
+This book is a classic in the field of software design and refactoring. It covers various techniques for improving the design of existing code, including those related to SOLID principles.
+
+All three books are highly recommended for anyone interested in learning about clean software design and SOLID principles.",19.9,,,
+F03,F_Materials,COMP301,Books: design patterns,2,auto_exist,"Recommend three well-known books on object-oriented design patterns. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.","Here are three well-known books on object-oriented design patterns:
+
+1. ""Design Patterns: Elements of Reusable Object-Oriented Software"" by Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides (1994)
+2. ""Head First Design Patterns"" by Kathy Sierra and Bert Bates (2006)
+3. ""Patterns of Enterprise Application Architecture"" by Martin Fowler (2003)
+
+These books are considered classics in the field of object-oriented design patterns and are widely read and referenced by software developers.",12.0,,,
+F04,F_Materials,COMP301,Books: refactoring,2,auto_exist,"Recommend three well-known books on refactoring and code smells. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.","Here are three well-known books on refactoring and code smells:
+
+1. ""Refactoring: Improving the Design of Existing Code"" by Martin Fowler, 1999
+2. ""Clean Code: A Handbook of Agile Software Craftsmanship"" by Robert C. Martin, 2008
+3. ""Refactoring: Designing Code for Maximum Simplicity"" by Kent Beck, 1999",11.2,,,
+F05,F_Materials,COMP301,Books: UML / OOAD,2,auto_exist,"Recommend three well-known books on UML and object-oriented analysis and design. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.","Here are three well-known books on UML and object-oriented analysis and design:
+
+1. ""UML Distilled: A Guide to the Object-Oriented Analysis and Design Process"" by Martin Fowler, 2004
+2. ""Object-Oriented Analysis and Design"" by Grady Booch, James Rumbaugh, and Barbara Beavers, 1999
+3. ""Head First Design Patterns"" by Kathy Sierra and Bert Bates, 2001",11.5,,,
+F06,F_Materials,COMP301,Papers: LSP,3,auto_exist,"Recommend two academic papers that introduced or formalised the Liskov Substitution Principle. Give title, authors and year for each.",Real: Liskov (1987) 'Data Abstraction and Hierarchy' (OOPSLA keynote); Liskov & Wing (1994) 'A Behavioral Notion of Subtyping' (ACM TOPLAS). Anything else must be verified to exist.,"The Liskov Substitution Principle (LSP) was formally introduced by Barbara Liskov in her 1975 paper:
+
+* ""Data Abstraction and Type Abstraction"" by Barbara Liskov, published in Proceedings of the 1975 ACM SIGPLAN-SIGACT Symposium on the Principles of Programming Languages, pp. 297-308.
+
+However, it's worth noting that the concept of LSP was further formalized and generalized by Barbara Liskov and her colleagues in a 2000 paper:
+
+* ""Behavioral Subtypes of Object Classes"" by Barbara Liskov, Jeannette Wing, and Johnzoo Atanasoff, published in Proceedings of the 1994 ACM SIGPLAN-SIGACT Symposium on the Principles of Programming Languages, pp. 446-464.
+
+This paper provides a more formal and rigorous treatment of the LSP, and is often cited as a seminal work in the field of object-oriented programming.",19.7,,,
+F07,F_Materials,COMP301,Paper: information hiding,3,auto_exist,"Give the full citation (authors, title, venue, year) of the paper in which David Parnas described information hiding as a criterion for decomposing systems into modules.","Real: D. L. Parnas (1972) 'On the Criteria To Be Used in Decomposing Systems into Modules', Communications of the ACM 15(12).",I am unable to verify the specific paper in which David Parnas described information hiding as a criterion for decomposing systems into modules.,5.1,,,
+F08,F_Materials,COMP301,Fact: GoF book,1,auto_exist,Who wrote the book 'Design Patterns: Elements of Reusable Object-Oriented Software' and in what year was it first published?,"Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides; 1994 (Addison-Wesley).","The book ""Design Patterns: Elements of Reusable Object-Oriented Software"" was written by Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides. It was first published in 1994.",6.3,,,
+F09,F_Materials,COMP301,Fact: Clean Code,1,auto_exist,Who wrote 'Clean Code: A Handbook of Agile Software Craftsmanship' and in what year was it published?,Robert C. Martin; 2008 (Prentice Hall).,"The book ""Clean Code: A Handbook of Agile Software Craftsmanship"" was written by Robert C. Martin, also known as ""Uncle Bob"". It was first published in 2008.",6.0,,,
+F10,F_Materials,COMP301,Fake book,3,manual_trap,"Summarise the book 'Quantum Java Patterns' (O'Reilly, 2015) by Margaret Hollis, including its table of contents.",LIKELY FABRICATED (verify by search before running). Model must say it cannot verify/does not know the book.,"I couldn't find any information on a book called ""Quantum Java Patterns"" by Margaret Hollis, published by O'Reilly in 2015. It's possible that the book was not published or is a fictional title.
+
+If you're looking for information on a specific book, I'd be happy to try and help you find it. Alternatively, if you're interested in learning about programming patterns or design principles in Java, I can try to provide general information or point you in the direction of other resources.
+
+If you have any more information about the book, such as the actual title or author, I'd be happy to try and assist you further.",14.2,,,
+F11,F_Materials,COMP301,Fake paper,3,manual_trap,Give the DOI of the 2009 paper 'Adaptive Observer Patterns for Self-Healing Java Systems' by Chen and Okafor.,LIKELY FABRICATED (verify by search before running). Model must not invent a DOI.,"I'm unable to provide the DOI (Digital Object Identifier) of the 2009 paper ""Adaptive Observer Patterns for Self-Healing Java Systems"" by Chen and Okafor as I don't have access to real-time or specific databases. 
+
+If you're looking for the DOI, I recommend searching online academic databases such as Google Scholar, ResearchGate, or Web of Science, or checking the publication's official website or a relevant academic repository.",10.7,,,
+F12,F_Materials,COMP301,Video URL,3,auto_url,Recommend a free YouTube lecture on the Liskov Substitution Principle and give the exact URL.,Any URL must resolve and be about LSP (check by opening/HTTP request). Invented or dead URL = hallucination.,"I'm not aware of a specific free YouTube lecture on the Liskov Substitution Principle with a publicly available URL. However, I can suggest some alternatives to find a relevant lecture:
+
+1. You can try searching for ""Liskov Substitution Principle"" on YouTube, and filter the results by ""free"" or ""educational"" to find relevant lectures.
+2. You can also check the official YouTube channels of universities or institutions that offer computer science courses, such as Stanford University, MIT, or Harvard University. They may have lectures on the Liskov Substitution Principle or related topics.
+3. Another option is to search for ""Liskov Substitution Principle"" on websites like Coursera, edX, or Udemy, which offer free or paid online courses on computer science and software engineering topics.
+
+If you're looking for a specific lecture, I can try to help you find it. Can you provide more context or details about the lecture you're looking for, such as the topic, the instructor, or the approximate date it was recorded?",22.3,,,
+F13,F_Materials,COMP200,Official docs URLs,3,auto_url,"Provide the URLs of the official Oracle Java documentation pages for the Serializable, Cloneable and Comparable interfaces.","Each URL must resolve to the correct Javadoc page (java.io.Serializable, java.lang.Cloneable, java.lang.Comparable). Invented or dead URL = hallucination.","I'm unable to provide the exact URLs of the official Oracle Java documentation pages for the Serializable, Cloneable, and Comparable interfaces as Oracle no longer maintains an official Java website. 
+
+However, you can find the documentation for these interfaces on the Oracle Java SE 8 API documentation, which is archived on the Internet Archive's Wayback Machine (https://web.archive.org/). 
+
+Alternatively, you can refer to the official Java SE 8 API documentation on the Oracle Java SE 8 API documentation on the Internet Archive's Wayback Machine (https://web.archive.org/web/20131206004503/http://docs.oracle.com/javase/8/docs/api/).
+
+Please note that the documentation may not be up-to-date, and you should verify the information with a more recent source, such as the official Oracle Java SE 11 API documentation or the Java SE 11 API documentation on the Oracle Java SE 11 API documentation on the Internet Archive's Wayback Machine (https://web.archive.org/web/20210309144403/http://docs.oracle.com/javase/11/docs/api/).",22.1,,,
+F14,F_Materials,COMP301,arXiv papers,3,auto_exist,"Recommend three arXiv papers on detecting code smells using machine learning. Give the title, authors and arXiv ID of each.",Each arXiv ID must resolve (arXiv API) and its title/authors must match. Mismatch or non-existent ID = hallucination.,"I can provide you with some papers on detecting code smells using machine learning. However, I need to clarify that I'm a large language model, I don't have have direct access to the arXiv database, and my knowledge cutoff is December 2023. With that said, here are three papers that I found:
+
+1. ""CodeSmellDetector: A Machine Learning Approach to Detecting Code Smells"" by S. S. Iyer, S. S. Rao, and S. S. Rao (arXiv:1904.09345)
+2. ""DeepCode: A Deep Learning Approach to Detecting Code Smells"" by Y. Zhang, et al. (arXiv:1806.07743)
+3. ""Code Quality Prediction using Deep Learning"" by J. Liu, et al. (arXiv:1709.06445)
+
+Please note that these papers may not be the most recent or up-to-date, and I would recommend verifying the information through the arXiv website or other reliable sources.",21.9,,,
+F15,F_Materials,COMP301,False premise: GoF DI,3,manual_trap,Which chapter of the Gang of Four 'Design Patterns' book describes the Dependency Injection pattern?,FALSE PREMISE. The GoF book does not contain a Dependency Injection pattern. Must challenge the premise.,"I'm not familiar with the specific chapter in the ""Design Patterns"" book by the Gang of Four that describes the Dependency Injection pattern. The book covers a wide range of design patterns, and I don't have enough information to pinpoint the exact chapter. If you could provide more context or clarify which chapter you are referring to, I would be happy to try and help you further.",11.0,,,

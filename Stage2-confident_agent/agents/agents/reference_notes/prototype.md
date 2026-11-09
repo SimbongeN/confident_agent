@@ -1,0 +1,9 @@
+# Prototype
+keywords: prototype, prototype pattern, clone, copy, prototypical instance
+- Intent: specify the kinds of objects to create using a prototypical instance, and create new objects by copying (cloning) this prototype. Object creational.
+- Use when a system should be independent of how its products are created, composed and represented, and: classes to instantiate are specified at run-time (e.g. dynamic loading); or to avoid a class hierarchy of factories paralleling the product hierarchy; or instances have only a few combinations of state, so cloning pre-installed prototypes is more convenient.
+- Participants: Prototype (interface for cloning itself), ConcretePrototype (implements cloning), Client (creates a new object by asking a prototype to clone itself).
+- Benefits: hides concrete product classes from clients; products can be added or removed at run-time by registering prototypes; new objects can be specified by varying values or structure (composites implementing Clone as a deep copy); reduces subclassing (no Creator hierarchy needed); lets a program be configured with dynamically loaded classes.
+- Liability: every Prototype subclass must implement Clone, which can be hard when classes already exist or internals include objects that do not support copying or have circular references.
+- Known uses: Sketchpad and ThingLab (early examples); the music-editor GraphicTool example (Unidraw); etgdb debugger adaptors; ModeComposer interaction technique library.
+- Related: Prototype and Abstract Factory are in some ways competing patterns but can be used together (a factory may store prototypes to clone). Designs using heavy Composite and Decorator often benefit from Prototype. The book judges Prototype probably best for the drawing-editor example because it needs only Clone and reduces the number of classes.

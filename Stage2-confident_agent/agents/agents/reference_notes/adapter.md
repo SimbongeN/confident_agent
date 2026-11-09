@@ -1,0 +1,12 @@
+# Adapter
+keywords: adapter, adapter pattern, wrapper, incompatible interfaces, convert interface, class adapter, object adapter
+- Intent: convert the interface of a class into another interface clients expect, letting classes work together that could not because of incompatible interfaces. Also known as Wrapper. Structural; class and object versions.
+- Use when you want to use an existing class whose interface does not match the one you need; or want a reusable class that cooperates with unrelated or unforeseen classes with incompatible interfaces.
+- Object adapter only: use when you need several existing subclasses but cannot practically adapt each by subclassing; an object adapter can adapt its parent class's interface.
+- Participants: Target (domain-specific interface Client uses), Client (works with Target objects), Adaptee (existing interface needing adaptation), Adapter (adapts Adaptee to Target). Clients call the Adapter, which calls Adaptee operations.
+- Class adapter (multiple inheritance): commits to a concrete Adaptee so cannot adapt a class and all its subclasses; can override Adaptee behavior; one object, no extra indirection.
+- Object adapter (composition): one Adapter works with many Adaptees (the class and its subclasses) and can add functionality to all; harder to override Adaptee behavior.
+- Adapters vary in how much they do, from renaming operations to supporting an entirely different operation set. "Pluggable adapters" build interface adaptation into a class (e.g. a reusable TreeDisplay widget).
+- Known uses: ET++Draw TextShape adapting TextView to Shape; Interviews GraphicBlock adapting Graphic to Interactor; ObjectWorks\Smalltalk PluggableAdaptor.
+- Distinguishing from similar patterns (book): Bridge has a structure similar to an object adapter but its intent is to separate an interface from its implementation so they vary independently, whereas an adapter changes the interface of an existing object. Decorator enhances an object without changing its interface, so it is more transparent and supports recursive composition, which pure adapters do not. Proxy represents another object and does not change its interface.
+- Structural discussion: Adapter resolves incompatibilities between two existing interfaces and is used after systems are designed; Bridge is used up-front when an abstraction must have several implementations. A facade defines a new interface, whereas an adapter reuses an old one.

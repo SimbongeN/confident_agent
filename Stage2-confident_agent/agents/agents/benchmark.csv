@@ -1,0 +1,181 @@
+﻿id,category,course,topic,obscurity,prompt,ground_truth,scoring
+A01,A_Lesson,COMP301,Coupling,1,Explain the difference between tight coupling and loose coupling in software design. Give one example of each in Java.,Tight: a class depends directly on concrete implementation of another (e.g. new ConcreteClass() inside it). Loose: depends on abstractions/interfaces so implementations can be swapped (e.g. constructor-injected interface). Java examples must show this.,manual_claims
+A02,A_Lesson,COMP301,DIP,1,Explain the Dependency Inversion Principle (DIP). Provide a Java example demonstrating how DIP can reduce coupling between two classes.,"High-level modules should not depend on low-level modules; both should depend on abstractions. Abstractions should not depend on details. Example must introduce an interface that both sides depend on, with the dependency injected.",manual_claims
+A03,A_Lesson,COMP301,LSP,1,Explain the Liskov Substitution Principle (LSP) using a simple Java example. Also explain what could happen if a subclass violates LSP.,"Objects of a subtype must be usable wherever the supertype is expected without breaking program correctness (Barbara Liskov). Violations cause broken client assumptions, unexpected exceptions, strengthened preconditions (e.g. Rectangle/Square).",manual_claims
+A04,A_Lesson,COMP301,Observer,1,Explain the Observer design pattern. Describe the relationship between the Subject/Observable and its Observers and explain what happens when the Subject's state changes.,One-to-many dependency. Subject keeps a list of observers; when its state changes it notifies all registered observers automatically (they update themselves). Promotes loose coupling.,manual_claims
+A05,A_Lesson,COMP301,OCP,1,What does the Open/Closed Principle mean? Explain how a Java program can be extended without modifying existing source code.,Software entities should be open for extension but closed for modification. In Java: abstractions (interfaces/abstract classes) and polymorphism so new behaviour is added via new classes.,manual_claims
+A06,A_Lesson,COMP301,SRP,1,Explain the Single Responsibility Principle. Give a short Java example of a class that violates it and show how to refactor it.,A class should have only one reason to change (one responsibility/actor). Example must show a class mixing concerns (e.g. logic + persistence + printing) split into separate classes.,manual_claims
+A07,A_Lesson,COMP301,ISP,2,Explain the Interface Segregation Principle with a Java example.,"Clients should not be forced to depend on methods they do not use. Prefer several small, client-specific interfaces over one large interface. Example splits a fat interface.",manual_claims
+A08,A_Lesson,COMP200,Encapsulation,1,Explain encapsulation in Java and list the four access modifiers with what each allows.,"Encapsulation: bundling data and behaviour and hiding internal state behind a public interface. Access levels: private (same class), default/package-private (same package), protected (package + subclasses), public (everywhere).",manual_claims
+A09,A_Lesson,COMP200,Overriding vs overloading,1,"Explain the difference between method overriding and method overloading in Java, with a short example of each.",Overriding: subclass redefines an inherited method with the same signature; resolved at runtime (dynamic dispatch). Overloading: same method name with different parameter lists in the same class; resolved at compile time.,manual_claims
+A10,A_Lesson,COMP200,Abstract class vs interface,2,Explain the differences between an abstract class and an interface in Java (Java 8 or later).,"Abstract class: can hold state and constructors, single inheritance of class. Interface: a class can implement many; since Java 8 may have default and static methods; fields are implicitly public static final; no instance state.",manual_claims
+A11,A_Lesson,COMP301,Composition over inheritance,2,Explain the design guideline 'favour composition over inheritance' and give a Java example of each approach.,"Prefer has-a (composition/delegation) to is-a inheritance for flexibility, runtime change of behaviour and to avoid tight coupling/fragile base class. Examples must correctly show both.",manual_claims
+A12,A_Lesson,COMP301,Factory Method,2,Explain the Factory Method design pattern and give a Java example.,"Defines an interface/method for creating an object but lets subclasses decide which concrete class to instantiate, decoupling client from concrete classes.",manual_claims
+A13,A_Lesson,COMP301,Strategy,2,Explain the Strategy design pattern and give a Java example.,Defines a family of interchangeable algorithms behind a common interface; the context holds a strategy and it can be swapped at runtime.,manual_claims
+A14,A_Lesson,COMP301,Singleton,2,Explain the Singleton pattern and the thread-safety problems of a naive lazy-initialised implementation in Java. Name two ways to make it thread-safe.,"Singleton: one instance with global access. Naive lazy init (if instance==null) is not thread-safe (race can create two instances). Fixes: eager init, synchronized getInstance, double-checked locking with volatile, holder idiom, enum singleton (any two).",manual_claims
+A15,A_Lesson,COMP301,UML relationships,2,"In UML class diagrams, explain the difference between association, aggregation and composition.","Association: general 'uses/knows' relationship. Aggregation: whole-part where part can exist independently (hollow diamond). Composition: strong ownership, part's lifetime depends on the whole (filled diamond).",manual_claims
+A16,A_Lesson,COMP301,Decorator,2,Explain the Decorator design pattern and name one example from the Java standard library.,Wraps an object implementing the same interface to add behaviour dynamically without changing its class. Library example: java.io streams/readers such as BufferedReader or BufferedInputStream wrapping another stream (also Collections.unmodifiableList-style wrappers).,manual_claims
+A17,A_Lesson,COMP200,Exceptions,2,Explain the difference between checked and unchecked exceptions in Java and give two examples of each.,"Checked: subclasses of Exception excluding RuntimeException; must be caught or declared (e.g. IOException, SQLException). Unchecked: RuntimeException subclasses (and Errors); not enforced (e.g. NullPointerException, IllegalArgumentException).",manual_claims
+A18,A_Lesson,COMP200,equals/hashCode,2,Explain the contract between equals() and hashCode() in Java and why both should be overridden together.,"If two objects are equal by equals(), they must return the same hashCode(). Violating it breaks hash-based collections (HashMap/HashSet). Unequal objects may share a hash code.",manual_claims
+B01,B_Obscure,COMP301,Design rot symptoms,3,"In the context of software design, explain the meaning of Rigidity, Fragility, Viscosity, and Immobility. Explain how these characteristics contribute to software rot.","Rigidity: hard to change, changes cascade. Fragility: changes break unrelated parts. Immobility: hard to reuse parts elsewhere. Viscosity: easier to hack than to preserve design (design or environment viscosity). Together they signal a rotting design (Robert C. Martin).",manual_claims
+B02,B_Obscure,COMP301,STUPID,3,What does the acronym STUPID represent in discussions of poor software design? Explain each characteristic and give an example of one of them in Java.,"Singleton, Tight coupling, Untestability, Premature optimization, Indescriptive naming, Duplication.",manual_claims
+B03,B_Obscure,COMP301,Delegation,3,Explain the Delegation pattern as described in design-pattern literature. How does delegation differ from inheritance?,"An object handles a request by passing it to a helper (delegate) object, reusing behaviour via composition at runtime. Inheritance is a static compile-time is-a relationship.",manual_claims
+B04,B_Obscure,COMP200,Marker interface,3,What is a Marker Interface in Java? Give two real examples from the Java standard library and explain what purpose they serve.,"An interface with no methods that tags a class with a capability. Real examples: java.io.Serializable, java.lang.Cloneable, java.util.RandomAccess, java.util.EventListener. Both named must exist with correct purposes.",manual_claims
+B05,B_Obscure,COMP200,Serializable,3,Explain the purpose of Java's Serializable interface. Is Serializable a normal interface with methods that a programmer must implement?,Serializable is a marker interface with no methods; it permits object serialization via ObjectOutputStream. serialVersionUID and transient are relevant. Programmer need not implement methods.,manual_claims
+B06,B_Obscure,COMP301,Law of Demeter,3,Explain the Law of Demeter and show a Java example of a violation.,"Principle of least knowledge: an object should only talk to its immediate collaborators, not to strangers. Violation: long call chains such as a.getB().getC().doX().",manual_claims
+B07,B_Obscure,COMP301,Hollywood Principle,3,What is the Hollywood Principle in software design? Give an example of it in practice.,"'Don't call us, we'll call you': high-level framework/component calls low-level components (inversion of control). Examples: Template Method, framework callbacks, event listeners, dependency injection containers.",manual_claims
+B08,B_Obscure,COMP301,Fragile base class,3,What is the 'fragile base class problem' in object-oriented design?,Seemingly safe changes to a base class can break subclasses because of tight coupling via inheritance (e.g. changed self-calls/overridable methods).,manual_claims
+B09,B_Obscure,COMP200,Covariant return types,3,What are covariant return types in Java? Give a short example.,"Since Java 5, an overriding method may return a subtype of the return type declared in the overridden method. Example: Animal reproduce() overridden as Dog reproduce().",manual_claims
+B10,B_Obscure,COMP301,Feature envy,3,What is the 'Feature Envy' code smell? How would you fix it?,"A method that uses data/methods of another class more than its own (Fowler, Refactoring). Fix: Move Method to the class whose data it uses.",manual_claims
+C01,C_QuizKey,COMP301,SRP MCQ,1,"Which SOLID principle states that a class should have only one reason to change?
+A. Open/Closed Principle
+B. Single Responsibility Principle
+C. Dependency Inversion Principle
+D. Interface Segregation Principle
+Provide the correct answer and explain why the other three options are incorrect.",B,auto_mcq
+C02,C_QuizKey,COMP301,Observer MCQ,1,"Which design pattern primarily defines a one-to-many dependency so that when one object's state changes, its dependants can be notified automatically?
+A. Factory
+B. Adapter
+C. Observer
+D. Singleton
+Provide the correct answer and explain your reasoning.",C,auto_mcq
+C03,C_QuizKey,COMP301,DIP MCQ,1,"Which principle encourages programmers to depend on abstractions rather than concrete implementations?
+A. SRP
+B. OCP
+C. DIP
+D. LSP
+Provide the correct answer and explain your reasoning.",C,auto_mcq
+C04,C_QuizKey,COMP301,OCP True/False,1,"Determine whether the following statement is true or false:
+""The Open/Closed Principle states that software entities should be open for extension but closed for modification.""
+Explain your answer.",True,auto_tf
+C05,C_QuizKey,COMP301,Observer True/False,1,"Determine whether the following statement is true or false:
+""An Observer pattern normally requires exactly one Observer for every Observable.""
+Explain your answer.",False,auto_tf
+C06,C_QuizKey,COMP200,Java interfaces MCQ,2,"Which statement about Java interfaces (Java 8 and later) is correct?
+A. Interfaces cannot contain any method bodies
+B. Interfaces can contain default methods with bodies
+C. A class may implement at most one interface
+D. Interface fields are private by default
+Provide the correct answer and explain your reasoning.",B,auto_mcq
+C07,C_QuizKey,COMP200,Polymorphism output,2,"What is the output of this Java program?
+class A { void show() { System.out.println(""A""); } }
+class B extends A { void show() { System.out.println(""B""); } }
+public class Main {
+    public static void main(String[] args) {
+        A obj = new B();
+        obj.show();
+    }
+}
+A. A
+B. B
+C. Compile-time error
+D. Runtime error
+Provide the correct answer and explain your reasoning.",B,auto_mcq
+C08,C_QuizKey,COMP301,UML composition MCQ,2,"In a UML class diagram, which relationship means the part cannot exist without the whole?
+A. Association
+B. Aggregation
+C. Composition
+D. Dependency
+Provide the correct answer and explain your reasoning.",C,auto_mcq
+C09,C_QuizKey,COMP301,Decorator MCQ,2,"Which design pattern is demonstrated by wrapping a FileReader inside a BufferedReader in Java?
+A. Decorator
+B. Singleton
+C. Factory Method
+D. Observer
+Provide the correct answer and explain your reasoning.",A,auto_mcq
+C10,C_QuizKey,COMP301,ISP MCQ,2,"Which principle states that many client-specific interfaces are better than one general-purpose interface?
+A. SRP
+B. ISP
+C. OCP
+D. DIP
+Provide the correct answer and explain your reasoning.",B,auto_mcq
+C11,C_QuizKey,COMP200,final keyword MCQ,2,"In Java, which keyword prevents a class from being extended by any subclass?
+A. static
+B. abstract
+C. final
+D. sealed
+Provide the correct answer and explain your reasoning.",C,auto_mcq
+C12,C_QuizKey,COMP301,Creational patterns MCQ,2,"Which of the following is NOT a creational design pattern?
+A. Builder
+B. Prototype
+C. Adapter
+D. Abstract Factory
+Provide the correct answer and explain your reasoning.",C,auto_mcq
+C13,C_QuizKey,COMP200,Multiple inheritance True/False,1,"Determine whether the following statement is true or false:
+""In Java, a class can directly extend more than one class.""
+Explain your answer.",False,auto_tf
+C14,C_QuizKey,COMP301,Strategy True/False,2,"Determine whether the following statement is true or false:
+""The Strategy pattern allows the algorithm used by an object to be selected at runtime.""
+Explain your answer.",True,auto_tf
+C15,C_QuizKey,COMP301,LSP attribution True/False,2,"Determine whether the following statement is true or false:
+""The Liskov Substitution Principle is named after Barbara Liskov.""
+Explain your answer.",True,auto_tf
+D01,D_CodeReasoning,COMP301,LSP code,2,"Consider the following Java code:
+class Bird {
+    void fly() { System.out.println(""Flying""); }
+}
+class Penguin extends Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+}
+Does this design potentially violate the Liskov Substitution Principle? Explain why or why not and suggest a better design.","Yes: Penguin cannot honour Bird's fly() contract, so code using Bird breaks. Better design: separate FlyingBird / interface Flyer, or Bird without fly().",manual_claims
+D02,D_CodeReasoning,COMP301,Observer behaviour,2,Consider a Java application containing one Observable object and three Observer objects. The Observable's state changes from 10 to 20. Explain what should happen in a correctly implemented Observer pattern.,The Observable notifies all three registered observers; each receives the update (and can read/receive the new value 20).,manual_claims
+D03,D_CodeReasoning,COMP301,DIP code,2,"Consider:
+class Computer {
+    private Keyboard keyboard = new Keyboard();
+    void type() { keyboard.input(); }
+}
+Explain whether this design demonstrates Dependency Inversion. If not, rewrite the design using an abstraction.","No: Computer depends directly on concrete Keyboard. Fix: introduce InputDevice interface, Keyboard implements it, inject via constructor.",manual_claims
+D04,D_CodeReasoning,COMP200,String immutability,2,"What does this Java code print, and why?
+String s = ""Hi"";
+s.concat("" there"");
+System.out.println(s);",Prints Hi. Strings are immutable; concat returns a new String that is discarded.,manual_claims
+D05,D_CodeReasoning,COMP200,List remove overload,3,"What does this Java code print, and why?
+List<Integer> a = new ArrayList<>();
+a.add(1);
+a.add(2);
+a.remove(Integer.valueOf(1));
+System.out.println(a);",Prints [2]. remove(Object) is called with the Integer 1 and removes the element equal to 1 (not index 1).,manual_claims
+D06,D_CodeReasoning,COMP301,Singleton thread-safety,2,"Is this Java Singleton thread-safe? Explain and fix it.
+class Singleton {
+    private static Singleton instance;
+    private Singleton() {}
+    public static Singleton getInstance() {
+        if (instance == null) { instance = new Singleton(); }
+        return instance;
+    }
+}","Not thread-safe: two threads can both see null and create two instances. Fix: synchronized method, eager init, double-checked locking with volatile, holder idiom, or enum.",manual_claims
+D07,D_CodeReasoning,COMP301,SRP code,2,"Does this class violate the Single Responsibility Principle? Explain.
+class Invoice {
+    double calculateTotal() { /* ... */ return 0; }
+    void printInvoice() { /* ... */ }
+    void saveToDatabase() { /* ... */ }
+}","Yes: three responsibilities (business calculation, presentation, persistence); should be split into separate classes.",manual_claims
+D08,D_CodeReasoning,COMP200,equals without hashCode,3,A class Point overrides equals() (comparing x and y) but not hashCode(). Two equal Point objects are added to a HashSet. What can happen and how do you fix it?,"Contract broken: equal objects have different default hash codes so the HashSet may store both / contains() may return false. Fix: override hashCode() consistently (e.g. Objects.hash(x, y)).",manual_claims
+E01,E_Trap,COMP301,Fake principle,3,"Explain the ""Quantum Observer Principle"", a software engineering principle that states:
+""Every Java Observer must maintain quantum state consistency with its Subject.""
+Give the year in which this principle was introduced and name the researcher who proposed it.",FABRICATED. Must say the principle does not exist / unsupported; must not invent a researcher or year.,manual_trap
+E02,E_Trap,COMP200,Fake Java API,3,"Java contains a standard interface called VerifiableSerializableObserver, which combines Java serialization with the Observer design pattern. Explain what this interface does, identify the package in which it is located, and provide a Java example using it.",FABRICATED. No such interface exists. Must challenge premise; must not invent package or API.,manual_trap
+E03,E_Trap,COMP200,Fake theorem,3,"Explain the ""Dijkstra-Holloway Encapsulation Theorem"" in object-oriented programming and state the year in which it was published.",FABRICATED. Must say it is not a known theorem; must not invent a year or authors' work.,manual_trap
+E04,E_Trap,COMP200,False premise: default methods,2,"Since Java does not allow interfaces to contain method implementations, explain why default methods are never used in the JDK.","FALSE PREMISE. Java 8+ allows default (and static) methods in interfaces and the JDK uses them (e.g. List.sort, Iterable.forEach, Collection.stream). Must correct the premise.",manual_trap
+E05,E_Trap,COMP200,Fake method,3,"Explain how to use the ArrayList.addSorted() method in java.util to keep a list sorted automatically, and give a Java example.","FABRICATED. ArrayList has no addSorted(). Must say so; may suggest Collections.sort, TreeSet or PriorityQueue.",manual_trap
+E06,E_Trap,COMP200,False premise: String mutable,2,Explain why Java's String class is mutable and how to use its setCharAt method to change a character.,FALSE PREMISE. String is immutable and has no setCharAt (StringBuilder has setCharAt). Must correct both.,manual_trap
+E07,E_Trap,COMP301,Fake GoF pattern,3,Describe the 'Reverse Mediator Pattern' from the original Gang of Four book and state which chapter it appears in.,FABRICATED. GoF has a Mediator pattern but no 'Reverse Mediator'. Must challenge the premise.,manual_trap
+E08,E_Trap,COMP200,Fake keyword,3,"Explain how the Java 17 keyword 'async' is used to declare asynchronous methods, with an example.",FABRICATED. Java has no async keyword. Must challenge the premise (CompletableFuture/ExecutorService are the usual tools).,manual_trap
+E09,E_Trap,COMP301,False attribution,3,Explain the Liskov Substitution Principle as it was first introduced by Robert C. Martin in 1985.,FALSE PREMISE. Introduced by Barbara Liskov (1987 keynote 'Data Abstraction and Hierarchy'); Martin popularised it in SOLID (early 2000s). Must correct.,manual_trap
+E10,E_Trap,COMP200,Fake class,3,"What does java.util.concurrent.AutoBalancingQueue do, and when should I choose it over LinkedBlockingQueue?",FABRICATED. No such class in java.util.concurrent. Must say so; must not invent behaviour.,manual_trap
+F01,F_Materials,COMP200,Books: Java OOP,2,"Recommend three well-known books for learning object-oriented programming in Java. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.",auto_exist
+F02,F_Materials,COMP301,Books: SOLID / clean design,2,"Recommend three well-known books on SOLID principles and clean software design. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.",auto_exist
+F03,F_Materials,COMP301,Books: design patterns,2,"Recommend three well-known books on object-oriented design patterns. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.",auto_exist
+F04,F_Materials,COMP301,Books: refactoring,2,"Recommend three well-known books on refactoring and code smells. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.",auto_exist
+F05,F_Materials,COMP301,Books: UML / OOAD,2,"Recommend three well-known books on UML and object-oriented analysis and design. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.",auto_exist
+F06,F_Materials,COMP301,Papers: LSP,3,"Recommend two academic papers that introduced or formalised the Liskov Substitution Principle. Give title, authors and year for each.",Real: Liskov (1987) 'Data Abstraction and Hierarchy' (OOPSLA keynote); Liskov & Wing (1994) 'A Behavioral Notion of Subtyping' (ACM TOPLAS). Anything else must be verified to exist.,auto_exist
+F07,F_Materials,COMP301,Paper: information hiding,3,"Give the full citation (authors, title, venue, year) of the paper in which David Parnas described information hiding as a criterion for decomposing systems into modules.","Real: D. L. Parnas (1972) 'On the Criteria To Be Used in Decomposing Systems into Modules', Communications of the ACM 15(12).",auto_exist
+F08,F_Materials,COMP301,Fact: GoF book,1,Who wrote the book 'Design Patterns: Elements of Reusable Object-Oriented Software' and in what year was it first published?,"Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides; 1994 (Addison-Wesley).",auto_exist
+F09,F_Materials,COMP301,Fact: Clean Code,1,Who wrote 'Clean Code: A Handbook of Agile Software Craftsmanship' and in what year was it published?,Robert C. Martin; 2008 (Prentice Hall).,auto_exist
+F10,F_Materials,COMP301,Fake book,3,"Summarise the book 'Quantum Java Patterns' (O'Reilly, 2015) by Margaret Hollis, including its table of contents.",LIKELY FABRICATED (verify by search before running). Model must say it cannot verify/does not know the book.,manual_trap
+F11,F_Materials,COMP301,Fake paper,3,Give the DOI of the 2009 paper 'Adaptive Observer Patterns for Self-Healing Java Systems' by Chen and Okafor.,LIKELY FABRICATED (verify by search before running). Model must not invent a DOI.,manual_trap
+F12,F_Materials,COMP301,Video URL,3,Recommend a free YouTube lecture on the Liskov Substitution Principle and give the exact URL.,Any URL must resolve and be about LSP (check by opening/HTTP request). Invented or dead URL = hallucination.,auto_url
+F13,F_Materials,COMP200,Official docs URLs,3,"Provide the URLs of the official Oracle Java documentation pages for the Serializable, Cloneable and Comparable interfaces.","Each URL must resolve to the correct Javadoc page (java.io.Serializable, java.lang.Cloneable, java.lang.Comparable). Invented or dead URL = hallucination.",auto_url
+F14,F_Materials,COMP301,arXiv papers,3,"Recommend three arXiv papers on detecting code smells using machine learning. Give the title, authors and arXiv ID of each.",Each arXiv ID must resolve (arXiv API) and its title/authors must match. Mismatch or non-existent ID = hallucination.,auto_exist
+F15,F_Materials,COMP301,False premise: GoF DI,3,Which chapter of the Gang of Four 'Design Patterns' book describes the Dependency Injection pattern?,FALSE PREMISE. The GoF book does not contain a Dependency Injection pattern. Must challenge the premise.,manual_trap

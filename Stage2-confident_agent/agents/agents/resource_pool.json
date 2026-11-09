@@ -1,0 +1,234 @@
+[
+ {
+  "title": "Design Patterns: Elements of Reusable Object-Oriented Software",
+  "authors": "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
+  "year": 1994,
+  "type": "book",
+  "topics": [
+   "design pattern",
+   "patterns",
+   "observer",
+   "factory",
+   "singleton",
+   "decorator",
+   "strategy",
+   "gang of four"
+  ]
+ },
+ {
+  "title": "Head First Design Patterns",
+  "authors": "Eric Freeman, Elisabeth Robson, Bert Bates, Kathy Sierra",
+  "year": 2004,
+  "type": "book",
+  "topics": [
+   "design pattern",
+   "patterns",
+   "observer",
+   "strategy",
+   "decorator",
+   "factory"
+  ]
+ },
+ {
+  "title": "Effective Java",
+  "authors": "Joshua Bloch",
+  "year": 2018,
+  "type": "book",
+  "topics": [
+   "java",
+   "best practice",
+   "equals",
+   "hashcode",
+   "immutab",
+   "object-oriented",
+   "oop"
+  ]
+ },
+ {
+  "title": "Head First Java",
+  "authors": "Kathy Sierra, Bert Bates",
+  "year": 2005,
+  "type": "book",
+  "topics": [
+   "java",
+   "object-oriented",
+   "oop",
+   "beginner",
+   "learning"
+  ]
+ },
+ {
+  "title": "Core Java Volume I: Fundamentals",
+  "authors": "Cay S. Horstmann",
+  "year": 2018,
+  "type": "book",
+  "topics": [
+   "java",
+   "object-oriented",
+   "oop",
+   "inheritance",
+   "interface",
+   "exception"
+  ]
+ },
+ {
+  "title": "Clean Code: A Handbook of Agile Software Craftsmanship",
+  "authors": "Robert C. Martin",
+  "year": 2008,
+  "type": "book",
+  "topics": [
+   "clean",
+   "design",
+   "solid",
+   "code smell",
+   "refactor"
+  ]
+ },
+ {
+  "title": "Clean Architecture",
+  "authors": "Robert C. Martin",
+  "year": 2017,
+  "type": "book",
+  "topics": [
+   "clean",
+   "design",
+   "solid",
+   "architecture"
+  ]
+ },
+ {
+  "title": "Agile Software Development, Principles, Patterns, and Practices",
+  "authors": "Robert C. Martin",
+  "year": 2002,
+  "type": "book",
+  "topics": [
+   "solid",
+   "principle",
+   "design",
+   "srp",
+   "ocp",
+   "lsp",
+   "isp",
+   "dip"
+  ]
+ },
+ {
+  "title": "Refactoring: Improving the Design of Existing Code",
+  "authors": "Martin Fowler",
+  "year": 1999,
+  "type": "book",
+  "topics": [
+   "refactor",
+   "code smell",
+   "smell",
+   "design"
+  ]
+ },
+ {
+  "title": "UML Distilled: A Brief Guide to the Standard Object Modeling Language",
+  "authors": "Martin Fowler",
+  "year": 2003,
+  "type": "book",
+  "topics": [
+   "uml",
+   "object-oriented analysis",
+   "class diagram",
+   "analysis and design"
+  ]
+ },
+ {
+  "title": "Applying UML and Patterns",
+  "authors": "Craig Larman",
+  "year": 2004,
+  "type": "book",
+  "topics": [
+   "uml",
+   "object-oriented analysis",
+   "analysis and design",
+   "patterns"
+  ]
+ },
+ {
+  "title": "Object-Oriented Software Construction",
+  "authors": "Bertrand Meyer",
+  "year": 1997,
+  "type": "book",
+  "topics": [
+   "object-oriented",
+   "open/closed",
+   "design by contract",
+   "oop"
+  ]
+ },
+ {
+  "title": "The Pragmatic Programmer",
+  "authors": "Andrew Hunt, David Thomas",
+  "year": 1999,
+  "type": "book",
+  "topics": [
+   "design",
+   "software engineering",
+   "clean"
+  ]
+ },
+ {
+  "title": "Code Complete",
+  "authors": "Steve McConnell",
+  "year": 2004,
+  "type": "book",
+  "topics": [
+   "design",
+   "construction",
+   "software engineering"
+  ]
+ },
+ {
+  "title": "On the Criteria To Be Used in Decomposing Systems into Modules",
+  "authors": "D. L. Parnas",
+  "year": 1972,
+  "type": "paper",
+  "topics": [
+   "information hiding",
+   "module",
+   "modular",
+   "decompos",
+   "encapsulation"
+  ]
+ },
+ {
+  "title": "Data Abstraction and Hierarchy",
+  "authors": "Barbara Liskov",
+  "year": 1987,
+  "type": "paper",
+  "topics": [
+   "liskov",
+   "substitution",
+   "subtyping",
+   "data abstraction"
+  ]
+ },
+ {
+  "title": "A Behavioral Notion of Subtyping",
+  "authors": "Barbara Liskov, Jeannette M. Wing",
+  "year": 1994,
+  "type": "paper",
+  "topics": [
+   "liskov",
+   "substitution",
+   "subtyping",
+   "behavioral"
+  ]
+ },
+ {
+  "title": "The Java Tutorials",
+  "url": "https://docs.oracle.com/javase/tutorial/",
+  "year": 0,
+  "type": "web",
+  "topics": [
+   "java",
+   "tutorial",
+   "oop",
+   "object-oriented"
+  ]
+ }
+]

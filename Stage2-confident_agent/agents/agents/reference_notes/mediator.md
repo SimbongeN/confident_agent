@@ -1,0 +1,11 @@
+# Mediator
+keywords: mediator, mediator pattern, colleague, centralize communication, dialog box, many-to-many
+- Intent: define an object that encapsulates how a set of objects interact; promotes loose coupling by keeping objects from referring to each other explicitly and lets you vary their interaction independently. Object behavioral.
+- Problem: distributing behavior among many objects can produce many interconnections (in the worst case every object knows every other), making objects hard to reuse and behavior hard to change without much subclassing.
+- Use when a set of objects communicate in well-defined but complex ways producing unstructured interdependencies; when reusing an object is difficult because it refers to many others; or when behavior distributed across classes should be customizable without a lot of subclassing.
+- Participants: Mediator (interface for communicating with Colleagues), ConcreteMediator (implements cooperative behavior, knows and maintains its colleagues), Colleague classes (each knows its mediator and talks to it instead of to other colleagues).
+- Benefits: limits subclassing (only the Mediator is subclassed); decouples colleagues; simplifies object protocols (many-to-many becomes one-to-many); abstracts how objects cooperate.
+- Liability: centralizes control; the mediator can become more complex than any colleague and turn into a monolith that is hard to maintain.
+- Known uses: dialog-box directors in ET++ and THINK C (the FontDialogDirector motivating example); Smalltalk/V ViewManager; ChangeManager for Observer; Unidraw CSolver.
+- Distinguishing (book): Facade abstracts a subsystem for convenience with a unidirectional protocol; Mediator enables cooperative behavior colleagues cannot provide themselves, with a multidirectional protocol. Colleagues can talk to the mediator using Observer. The Ch. 5 intro says the mediator provides the indirection needed for loose coupling; Chain of Responsibility provides even looser coupling.
+- Distinguishing from Observer (Ch. 5 discussion): Mediator centralizes communication and the constraint-maintaining responsibility in one object, while Observer distributes it; Mediator's flow is easier to follow but mediators are harder to make reusable.

@@ -1,0 +1,513 @@
+﻿code,prompt,ground_truth,response,correct,hallucination,hall_type,notes
+R003,"Consider the following Java code:
+class Bird {
+    void fly() { System.out.println(""Flying""); }
+}
+class Penguin extends Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+}
+Does this design potentially violate the Liskov Substitution Principle? Explain why or why not and suggest a better design.","Yes: Penguin cannot honour Bird's fly() contract, so code using Bird breaks. Better design: separate FlyingBird / interface Flyer, or Bird without fly().","The provided Java code defines a `Bird` class with a `fly()` method and a `Penguin` class that extends `Bird` and overrides the `fly()` method to throw an `UnsupportedOperationException`. 
+
+This design potentially violates the Liskov Substitution Principle (LSP) because `Penguin` objects cannot be used as substitutes for `Bird` objects in a program. The reason is that `Penguin` objects will throw an exception when the `fly()` method is called, whereas `Bird` objects will simply print ""Flying"". This inconsistency in behavior means that `Penguin` objects cannot be used in place of `Bird` objects without altering the correctness of the program.
+
+A better design would be to remove the `fly()` method from the `Penguin` class and instead provide a separate method that indicates whether a penguin can fly. For example:
+
+```java
+class Bird {
+    void fly() { System.out.println(""Flying""); }
+}
+
+class Penguin extends Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+}
+
+class PenguinFlyStatus {
+    static boolean canFly() { return false; }
+}
+```
+
+In this revised design, `Penguin` objects can be used as substitutes for `Bird` objects in a program, and the `PenguinFlyStatus` class provides a way to determine whether a penguin can fly. This design adheres to the LSP by ensuring that `Penguin` objects behave consistently with `Bird` objects.",0,1,,
+R006,What does the acronym STUPID represent in discussions of poor software design? Explain each characteristic and give an example of one of them in Java.,"Singleton, Tight coupling, Untestability, Premature optimization, Indescriptive naming, Duplication.","The acronym STUPID represents six anti-patterns in software design that developers should avoid. These patterns are:
+
+1. **S**ingleton: A Singleton is a design pattern where a class has a single instance that can be accessed globally. This can lead to tight coupling and make the code harder to test and maintain.
+
+Example in Java: A Singleton class in Java is typically implemented using a private constructor and a static instance variable. For example:
+```java
+public class Logger {
+    private static Logger instance;
+    private Logger() {}
+    public static Logger getInstance() {
+        if (instance == null) {
+            instance = new Logger();
+        }
+        return instance;
+    }
+}
+```
+This implementation is often criticized for being a Singleton, as it makes the class tightly coupled and difficult to test.
+
+2. **T**ight coupling: Tight coupling occurs when two or more classes are highly dependent on each other, making it difficult to test and maintain the code.
+
+3. **U**ntestability: Untestability refers to the difficulty of writing unit tests for a piece of code. This can make it challenging to ensure the code is reliable and works as expected.
+
+4. **P**remature optimization: Premature optimization is the practice of optimizing code before it is fully understood or before it has been thoroughly tested. This can lead to unnecessary complexity and make the code harder to maintain.
+
+5. **I**ndescriptive naming: Indescriptive naming refers to the use of variable and method names that do not clearly convey their purpose or behavior.
+
+6. **D**uplication: Duplication occurs when code is repeated unnecessarily, making it harder to maintain and modify.
+
+It's worth noting that the concept of STUPID as an acronym for anti-patterns in software design is not widely recognized or established in the software development community. The individual anti-patterns listed above are well-known and widely discussed, but the acronym STUPID is not a commonly used term.",1,0,,
+R009,Explain the contract between equals() and hashCode() in Java and why both should be overridden together.,"If two objects are equal by equals(), they must return the same hashCode(). Violating it breaks hash-based collections (HashMap/HashSet). Unequal objects may share a hash code.","In Java, the `equals()` and `hashCode()` methods are related but distinct. Both methods are used to determine the identity and uniqueness of objects, but they serve different purposes.
+
+`equals()` is used to determine whether two objects are equal, meaning they have the same value or representation. It is typically used in comparison operations, such as `if (obj1.equals(obj2))`. The `equals()` method is not necessarily related to the object's identity, but rather its value or content.
+
+`hashCode()`, on the other hand, is used to determine the hash code of an object, which is an integer value that represents the object's identity. The `hashCode()` method is used in data structures such as `HashMap` and `HashSet`, where objects are stored and retrieved based on their hash codes.
+
+In general, it is recommended to override both `equals()` and `hashCode()` methods together, as they are closely related and should produce consistent results. If one method is overridden, it is generally a good practice to override the other as well, to ensure that the object's identity and uniqueness are properly represented.
+
+However, I am uncertain about the specific reason why both methods should be overridden together. I can confirm that the `equals()` and `hashCode()` methods are related and should be consistent, but I do not have information on the specific benefits of overriding both methods together.",0,1,,
+R012,Explain the Law of Demeter and show a Java example of a violation.,"Principle of least knowledge: an object should only talk to its immediate collaborators, not to strangers. Violation: long call chains such as a.getB().getC().doX().","The Law of Demeter is a design guideline that aims to reduce coupling between objects and make internal implementation changes less likely to affect callers. It is often summarized as ""talk only to your immediate friends."" In other words, a method should generally communicate with objects it directly knows, such as its parameters, its own fields, and objects it creates.
+
+A common example of a violation of the Law of Demeter is a chain of calls that navigates through several unrelated objects. For instance, consider a method that orders a product and returns the customer's address. The method might look like this:
+
+```java
+public class Order {
+    private Customer customer;
+    private Address address;
+
+    public Order(Customer customer, Address address) {
+        this.customer = customer;
+        this.address = address;
+    }
+
+    public Address getCustomerAddress() {
+        return customer.getAddress();
+    }
+}
+
+public class Customer {
+    private Address address;
+
+    public Address getAddress() {
+        return address;
+    }
+}
+
+public class Address {
+    private String city;
+
+    public String getCity() {
+        return city;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Customer customer = new Customer();
+        Address address = new Address();
+        address.setCity(""New York"");
+        customer.setAddress(address);
+        Order order = new Order(customer, address);
+        System.out.println(order.getCustomerAddress().getCity()); // prints ""New York""
+    }
+}
+```
+
+In this example, the `getCustomerAddress()` method returns the customer's address, which is an object that has its own `getCity()` method. This creates a chain of calls that navigates through several unrelated objects, which is a violation of the Law of Demeter. The caller depends on the internal structure of several other objects, rather than just the objects it directly knows.
+
+To improve this code, we can encapsulate the request in a method on the nearer object, such as the `Order` class. We can add a new method that returns the customer's city, like this:
+
+```java
+public class Order {
+    private Customer customer;
+    private Address address;
+
+    public Order(Customer customer, Address address) {
+        this.customer = customer;
+        this.address = address;
+    }
+
+    public String getCustomerCity() {
+        return customer.getAddress().getCity();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Customer customer = new Customer();
+        Address address = new Address();
+        address.setCity(""New York"");
+        customer.setAddress(address);
+        Order order = new Order(customer, address);
+        System.out.println(order.getCustomerCity()); // prints ""New York""
+    }
+}
+```
+
+In this improved version, the `getCustomerCity()` method returns the customer's city, without creating a chain of calls that navigates through several unrelated objects. This reduces coupling and makes internal implementation changes less likely to affect callers.",0,1,,
+R015,What is a Marker Interface in Java? Give two real examples from the Java standard library and explain what purpose they serve.,"An interface with no methods that tags a class with a capability. Real examples: java.io.Serializable, java.lang.Cloneable, java.util.RandomAccess, java.util.EventListener. Both named must exist with correct purposes.","A marker interface in Java is an interface with no method declarations, used to indicate that a class has a particular property or capability. A class marks itself by declaring that it implements the marker interface. Code can test whether an object has the marker type using `instanceof` or type-based APIs.
+
+Two real examples from the Java standard library are `java.io.Serializable` and `java.lang.Cloneable`.
+
+The `java.io.Serializable` marker interface indicates that instances may be serialized under Java serialization rules. Implementing `Serializable` makes an object's class eligible for Java's standard object-serialization mechanism. The serializable state generally consists of non-static, non-transient instance fields, subject to the serialization rules. A field whose referenced object is not serializable can cause serialization to fail with `NotSerializableException` unless handled appropriately. Declaring a `serialVersionUID` lets a class specify a version identifier used during serialization compatibility checks.
+
+The `java.lang.Cloneable` marker interface affects the behavior of `Object.clone()`. Implementing `Cloneable` indicates that an object's class can be cloned, but it does not guarantee that every operation associated with the clone will succeed.",1,0,,
+R018,"Recommend three well-known books on SOLID principles and clean software design. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.","Here are three well-known books on SOLID principles and clean software design:
+
+1. ""Clean Code: A Handbook of Agile Software Craftsmanship"" by Robert C. Martin (2008)
+
+This book focuses on the importance of writing clean, maintainable code, and it introduces the SOLID principles as a way to achieve that goal.
+
+2. ""Head First Design Patterns"" by Kathy Sierra and Bert Bates (2006)
+
+While not exclusively focused on SOLID principles, this book introduces design patterns and principles, including SOLID, in an accessible and engaging way.
+
+3. ""Refactoring: Improving the Design of Existing Code"" by Martin Fowler (1999)
+
+This book is a classic in the field of software design and refactoring. It covers various techniques for improving the design of existing code, including those related to SOLID principles.
+
+All three books are highly recommended for anyone interested in learning about clean software design and SOLID principles.",0,1,,
+R021,What does the acronym STUPID represent in discussions of poor software design? Explain each characteristic and give an example of one of them in Java.,"Singleton, Tight coupling, Untestability, Premature optimization, Indescriptive naming, Duplication.","In discussions of poor software design, the acronym STUPID is often used to illustrate a set of characteristics that can lead to maintainable and efficient software. Each letter in STUPID represents a characteristic of poor design:
+
+S - Single Responsibility Principle (SRP): A class or module should have only one reason to change.
+
+T - Tight Coupling: Modules or classes should be loosely coupled, meaning they should not be tightly dependent on each other.
+
+U - Unnecessary Complexity: A design should avoid unnecessary complexity, such as redundant code or unnecessary abstractions.
+
+P - Poor Abstraction: A design should use abstraction to hide implementation details and expose only necessary information.
+
+I - Inconsistent Interface: A design should have a consistent interface, meaning that the same interface should be used consistently throughout the system.
+
+D - Deep Inheritance Hierarchy: A design should avoid deep inheritance hierarchies, where a class inherits from many other classes.
+
+Here's an example of how the Single Responsibility Principle (SRP) can be violated in Java:
+
+```java
+public class Employee {
+    private String name;
+    private String department;
+    private String jobTitle;
+
+    public Employee(String name, String department, String jobTitle) {
+        this.name = name;
+        this.department = department;
+        this.jobTitle = jobTitle;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    public void printEmployeeInfo() {
+        System.out.println(""Name: "" + name);
+        System.out.println(""Department: "" + department);
+        System.out.println(""Job Title: "" + jobTitle);
+    }
+}
+```
+
+In this example, the `Employee` class has multiple responsibilities: it stores employee data, sets department and job title, and prints employee information. This violates the Single Responsibility Principle, as the class should have only one reason to change. A better design would be to have separate classes for `EmployeeData`, `Department`, `JobTitle`, and `EmployeePrinter`, each with their own single responsibility.",0,1,,
+R024,What is the 'Feature Envy' code smell? How would you fix it?,"A method that uses data/methods of another class more than its own (Fowler, Refactoring). Fix: Move Method to the class whose data it uses.","Feature Envy is a code smell that refers to a situation where a method accesses the data of another object more than its own data. In other words, a method is relying too heavily on another object's data, rather than maintaining its own state.
+
+To fix Feature Envy, it's essential to identify the methods that are accessing the data of another object and consider the following options:
+
+1. Extract the data into the object's own state: If the method is accessing data that is already stored in the object, it might be better to access that data directly, rather than relying on the method.
+2. Create a new object to hold the shared data: If the data is being shared between multiple objects, it might be better to create a new object that holds that data, and have both objects access it through that object.
+3. Refactor the method to reduce its reliance on the other object's data: If the method is doing too much, it might be better to break it down into smaller methods, each with its own responsibility.
+
+By addressing Feature Envy, developers can improve the maintainability and readability of their code, and reduce the risk of bugs and errors.",0,1,,
+R027,"Is this Java Singleton thread-safe? Explain and fix it.
+class Singleton {
+    private static Singleton instance;
+    private Singleton() {}
+    public static Singleton getInstance() {
+        if (instance == null) { instance = new Singleton(); }
+        return instance;
+    }
+}","Not thread-safe: two threads can both see null and create two instances. Fix: synchronized method, eager init, double-checked locking with volatile, holder idiom, or enum.","The provided Java Singleton implementation is not thread-safe. 
+
+The issue lies in the fact that multiple threads can execute the `getInstance()` method simultaneously, potentially leading to multiple instances of the Singleton class being created. This is because the `instance` variable is not synchronized.
+
+Here's why:
+
+1. Thread A calls `getInstance()`.
+2. Thread B calls `getInstance()`.
+3. Both threads check if `instance` is `null`. Since it's not `null`, they both proceed to create a new instance.
+4. Both threads create a new instance of the Singleton class.
+
+As a result, you'll end up with multiple instances of the Singleton class, which defeats the purpose of a Singleton.
+
+To fix this, you can use the double-checked locking mechanism, which is a common approach for thread-safe Singleton implementations:
+
+```java
+class Singleton {
+    private static volatile Singleton instance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+In this implementation, we use the `volatile` keyword to ensure that changes to the `instance` variable are visible to all threads. We also use the double-checked locking mechanism to reduce the overhead of synchronization.
+
+However, a more modern and efficient approach is to use the Bill Pugh Singleton implementation, which is thread-safe and doesn't require synchronization:
+
+```java
+class Singleton {
+    private Singleton() {}
+
+    private static class SingletonHelper {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+}
+```
+
+In this implementation, we use a nested static class to encapsulate the Singleton instance. This approach is thread-safe because the instance is created only once, when the class is loaded, and is shared among all threads.",1,0,,
+R030,"Explain the difference between method overriding and method overloading in Java, with a short example of each.",Overriding: subclass redefines an inherited method with the same signature; resolved at runtime (dynamic dispatch). Overloading: same method name with different parameter lists in the same class; resolved at compile time.,"In Java, method overriding and method overloading are two distinct concepts that allow for more flexibility in programming.
+
+**Method Overriding**
+
+Method overriding occurs when a child class provides a specific implementation of a method that is already defined in its parent class. The key characteristic of method overriding is that the child class method has the same signature as the parent class method, meaning it has the same name and parameter list. The parameter names do not matter, only the types. When a child object is created, it uses the version of the method defined in the child class, not the parent class.
+
+Here's an example of method overriding:
+
+```java
+public class Animal {
+    public void sound() {
+        System.out.println(""The animal makes a sound."");
+    }
+}
+
+public class Dog extends Animal {
+    @Override
+    public void sound() {
+        System.out.println(""The dog barks."");
+    }
+}
+```
+
+In this example, the `Dog` class overrides the `sound()` method of the `Animal` class. When a `Dog` object is created, it uses the `sound()` method defined in the `Dog` class, which prints ""The dog barks."".
+
+**Method Overloading**
+
+Method overloading, on the other hand, occurs when a class provides multiple definitions for a method with the same name, but different parameter lists. The compiler chooses which method to invoke based on the arguments passed to the method. The parameter list must be different, but the return type and access level can be the same.
+
+Here's an example of method overloading:
+
+```java
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+
+    public double add(double a, double b) {
+        return a + b;
+    }
+
+    public int add(int a, int b, int c) {
+        return a + b + c;
+    }
+}
+```
+
+In this example, the `Calculator` class has three definitions for the `add()` method, each with a different parameter list. When an object of the `Calculator` class is created, the compiler chooses which `add()` method to invoke based on the arguments passed to the method.
+
+It's worth noting that constructors cannot be overloaded, but methods can. Additionally, changing only the name of a method does not create a new method, but rather an additional, unrelated method.",1,1,,
+R033,"Recommend three well-known books on UML and object-oriented analysis and design. Give the title, author and publication year of each.","Every cited title, author and year must be verified (Open Library / Google Books / arXiv). Any non-existent or misattributed reference = hallucination.","Verified resources:
+- 1. ""UML Distilled: A Guide to the Object-Oriented Analysis and Design Process"" by Martin Fowler, 2004
+
+(Other suggestions could not be verified and were removed.)",0,0,,
+R036,Explain the Delegation pattern as described in design-pattern literature. How does delegation differ from inheritance?,"An object handles a request by passing it to a helper (delegate) object, reusing behaviour via composition at runtime. Inheritance is a static compile-time is-a relationship.","The Delegation pattern is a design pattern that involves creating an object that acts as an intermediary between the client and the actual service provider. This pattern is often used to implement a ""proxy"" or ""wrapper"" object that delegates requests to another object, rather than performing the work itself.
+
+Delegation differs from inheritance in that it does not create an ""is-a"" relationship between the delegating object and the service provider object. Instead, the delegating object holds a reference to the service provider object and forwards requests to it. This allows the delegating object to control the flow of requests and can provide additional functionality or validation before delegating the request.
+
+In contrast, inheritance creates an ""is-a"" relationship between the subclass and the superclass, where the subclass inherits the properties and behavior of the superclass. This can create a tight coupling between the subclass and the superclass, where the subclass depends on the superclass implementation and its assumptions.
+
+The Delegation pattern is often used when a class needs to use a capability without being a specialized kind of the class providing it. For example, a `Car` object might delegate engine operations to an `Engine` object, rather than having its own engine implementation. This allows the `Car` object to focus on its own behavior and responsibilities, while still providing access to the engine capabilities.
+
+It's worth noting that the Delegation pattern is often used in conjunction with other design patterns, such as the Law of Demeter, which is a design guideline that encourages developers to minimize the number of objects that an object needs to know about in order to function correctly. The Law of Demeter suggests that a method should generally communicate with objects it directly knows, rather than trying to navigate through a chain of objects to achieve a goal.",1,0,,
+R039,"Is this Java Singleton thread-safe? Explain and fix it.
+class Singleton {
+    private static Singleton instance;
+    private Singleton() {}
+    public static Singleton getInstance() {
+        if (instance == null) { instance = new Singleton(); }
+        return instance;
+    }
+}","Not thread-safe: two threads can both see null and create two instances. Fix: synchronized method, eager init, double-checked locking with volatile, holder idiom, or enum.","The provided Java code is not thread-safe. The issue lies in the fact that the `getInstance()` method is not synchronized, which means that multiple threads can access and potentially create multiple instances of the `Singleton` class simultaneously.
+
+To fix this, we can use the double-checked locking mechanism, which is a common approach to thread-safety in Java. Here's an improved version of the `Singleton` class:
+
+```java
+class Singleton {
+    private static volatile Singleton instance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+In this version, we've made the `instance` variable `volatile` to ensure that changes to it are visible to all threads. We've also added a double-checked locking mechanism to ensure that the instance is created only once, even in the presence of concurrent access.
+
+Note that we've also removed the `instance = new Singleton();` line from the inner synchronized block, as it's not necessary. The `instance` variable is already initialized to `null` before the synchronized block, so we can simply check its value and create a new instance if necessary.
+
+Alternatively, we can use the Bill Pugh Singleton implementation, which is a more elegant and efficient way to implement thread-safety:
+
+```java
+class Singleton {
+    private Singleton() {}
+
+    private static class SingletonHelper {
+        private static final Singleton instance = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return SingletonHelper.instance;
+    }
+}
+```
+
+In this version, we've created a nested static class `SingletonHelper` that contains the instance of the `Singleton` class. This approach is thread-safe because the instance is created only once, and it's not visible to the outside world until it's accessed through the `getInstance()` method.",1,1,,
+R042,"Consider the following Java code:
+class Bird {
+    void fly() { System.out.println(""Flying""); }
+}
+class Penguin extends Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+}
+Does this design potentially violate the Liskov Substitution Principle? Explain why or why not and suggest a better design.","Yes: Penguin cannot honour Bird's fly() contract, so code using Bird breaks. Better design: separate FlyingBird / interface Flyer, or Bird without fly().","The provided Java code does not directly violate the Liskov Substitution Principle (LSP), but it does introduce a potential issue.
+
+The LSP states that subtypes should be substitutable for their base types. In this case, `Penguin` is a subtype of `Bird`, and it overrides the `fly()` method. However, the `fly()` method in `Penguin` throws an `UnsupportedOperationException`, indicating that it does not support flying.
+
+The issue arises when we consider the `fly()` method in the context of the LSP. If we try to use a `Penguin` object as a `Bird` object, the `fly()` method will be called, which will throw an exception. This is not a problem in itself, but it means that the `Penguin` class is not substituting for the `Bird` class in the sense that it does not provide the same behavior as the `Bird` class.
+
+A better design would be to remove the `fly()` method from the `Penguin` class and instead provide a separate method that indicates whether the penguin can fly or not. This would allow the `Penguin` class to be used as a `Bird` object without throwing an exception.
+
+Here's an example of how the improved design could look:
+
+```java
+class Bird {
+    void fly() { System.out.println(""Flying""); }
+}
+
+class Penguin extends Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+
+    boolean canFly() { return false; }
+}
+```
+
+In this design, the `Penguin` class provides a `canFly()` method that indicates whether the penguin can fly or not. This allows the `Penguin` class to be used as a `Bird` object without violating the LSP.
+
+Alternatively, we could also consider using an interface instead of a class for the `Bird` type, like this:
+
+```java
+interface Bird {
+    void fly();
+}
+
+class Penguin implements Bird {
+    @Override
+    void fly() { throw new UnsupportedOperationException(); }
+
+    boolean canFly() { return false; }
+}
+```
+
+This design would also allow the `Penguin` class to be used as a `Bird` object without violating the LSP.",0,1,,
+R045,Explain why Java's String class is mutable and how to use its setCharAt method to change a character.,FALSE PREMISE. String is immutable and has no setCharAt (StringBuilder has setCharAt). Must correct both.,"**Why Java's String class is mutable**
+
+In Java, the `String` class is a mutable class, meaning that its state can be changed after it's created. This is in contrast to immutable classes, where the state cannot be changed once the object is created.
+
+The reason for making `String` mutable is largely historical and related to the way strings were implemented in Java. In the early days of Java, strings were implemented as arrays of characters. When a string was created, a new array of characters was allocated, and a reference to this array was stored in the `String` object.
+
+Over time, the `String` class was modified to use a more efficient implementation, known as the ""interning"" algorithm. This algorithm stores all string literals in a pool of unique strings, and when a new string is created, it checks if the new string already exists in the pool. If it does, the existing string is returned; otherwise, a new string is created and stored in the pool.
+
+Despite this optimization, the `String` class remains mutable because it's still based on an array of characters, which can be modified. When you call the `setCharAt` method, you're modifying the underlying array, which changes the state of the `String` object.
+
+**Using the `setCharAt` method to change a character**
+
+The `setCharAt` method is a part of the `String` class in Java, and it allows you to change a character at a specific index in the string.
+
+Here's an example of how to use the `setCharAt` method:
+```java
+public class Main {
+    public static void main(String[] args) {
+        String str = ""Hello, World!"";
+        System.out.println(""Original string: "" + str);
+
+        // Change the character at index 7 (the comma)
+        str.setCharAt(7, ',');
+        str.setCharAt(8, 'x'); // Change the character after the comma
+
+        System.out.println(""Modified string: "" + str);
+    }
+}
+```
+In this example, we create a `String` object `str` and print its original value. We then change the character at index 7 (the comma) to an 'x', and print the modified string.
+
+Note that the `setCharAt` method takes two parameters: the index of the character to change, and the new character value. If the index is out of bounds, the method will throw an `IndexOutOfBoundsException`.
+
+**Important note**
+
+While the `String` class is mutable, it's generally not recommended to modify its contents directly, as this can lead to unexpected behavior and bugs. Instead, consider using the `StringBuilder` class, which is designed for mutable string manipulation.",0,1,,
+R048,Explain the Liskov Substitution Principle as it was first introduced by Robert C. Martin in 1985.,FALSE PREMISE. Introduced by Barbara Liskov (1987 keynote 'Data Abstraction and Hierarchy'); Martin popularised it in SOLID (early 2000s). Must correct.,"I am uncertain about the specific details of Robert C. Martin's introduction of the Liskov Substitution Principle in 1985. However, I can provide an explanation of the principle based on widely accepted information.
+
+The Liskov Substitution Principle (LSP) is a fundamental concept in object-oriented programming that states that subtypes should be substitutable for their base types. In other words, objects of a derived class should be able to replace objects of the base class without affecting the correctness of the program.
+
+The principle is often summarized as: ""Objects of a derived class must behave consistently with objects of the base class."" This means that if a base class has a certain behavior or property, the derived class should also have that behavior or property, and it should be able to be used in the same way as the base class.
+
+The LSP is one of the five SOLID principles, which are widely accepted design principles for object-oriented programming. The other SOLID principles are:
+
+* Single Responsibility Principle (SRP)
+* Open/Closed Principle (OCP)
+* Interface Segregation Principle (ISP)
+* Dependency Inversion Principle (DIP)
+
+I am unable to confirm the specific details of Robert C. Martin's introduction of the LSP in 1985, including the year or the context in which it was introduced.",1,0,,
+R051,What is the Hollywood Principle in software design? Give an example of it in practice.,"'Don't call us, we'll call you': high-level framework/component calls low-level components (inversion of control). Examples: Template Method, framework callbacks, event listeners, dependency injection containers.","The Hollywood Principle is a design principle in software development that states: ""Don't talk to me, talk to the actor."" In other words, instead of having a piece of code (the actor) perform a specific action, it should be responsible for receiving a message or instruction (the director) and then performing the desired action.
+
+This principle is named after the Hollywood film industry, where actors are expected to respond to the director's cues and perform the actions required to tell the story. Similarly, in software design, the principle suggests that components or objects should be designed to receive instructions or messages from other components, rather than having to be told what to do.
+
+Here's an example of the Hollywood Principle in practice:
+
+Suppose we're building a banking system that needs to transfer funds between accounts. Instead of having the ""Transfer Funds"" class directly instruct the ""Account"" class to subtract the specified amount, we can design the system so that the ""Transfer Funds"" class sends a message to the ""Account"" class, instructing it to perform the transfer.
+
+In this design, the ""Transfer Funds"" class is the ""actor"" that performs the action of transferring funds, while the ""Account"" class is the ""director"" that receives the message and performs the necessary action to update its balance.
+
+For example, the ""Transfer Funds"" class might have a method called `transferFunds(amount)` that sends a message to the ""Account"" class with the amount to be transferred. The ""Account"" class would then receive this message and perform the necessary action to update its balance.
+
+This design follows the Hollywood Principle because the ""Transfer Funds"" class is not told what to do; instead, it receives a message that instructs it to perform the desired action. This makes the code more modular, flexible, and easier to maintain.",0,1,,

@@ -1,0 +1,98 @@
+File | Course | Source (for your report)
+abstract-classes.md | COMP200 | COMP200 textbook, Section 4.1 (pp. 99-106)
+access-control.md | COMP200 | COMP200 textbook, Section 3.6 (pp. 92-97) and Section 1.2 "Access Control" (pp. 15-16)
+constructors-and-object-creation.md | COMP200 | COMP200 textbook, Section 1.2 "Creating and Destroying Objects" (pp. 16-23) and Section 3.2 (pp. 80-83)
+crc-cards-and-uml.md | COMP200 | COMP200 textbook, Sections 2.2-2.3 (pp. 49-58)
+error-handling-exceptions.md | COMP200 | COMP200 textbook, Section 1.3 (pp. 26-29)
+event-handling-and-listeners.md | COMP200 | COMP200 textbook, Section 5.1 "Events and Listeners" (pp. 130-131) and Section 5.3 (pp. 143-155)
+everything-is-not-an-object.md | COMP200 | COMP200 textbook, Section 1.2 "Everything is NOT an object" (pp. 24-26)
+garbage-collection.md | COMP200 | COMP200 textbook, Section 1.2 "Garbage Collection" (pp. 23-24)
+inheritance-and-types.md | COMP200 | COMP200 textbook, Section 3.5 (pp. 88-92); Section 4.1 (p. 102); Section 4.2 (p. 117); Section 1.1 (p. 2)
+inheritance.md | COMP200 | COMP200 textbook, Sections 3.1-3.2 (pp. 75-83)
+interfaces.md | COMP200 | COMP200 textbook, Section 4.2 (pp. 106-119)
+javadoc.md | COMP200 | COMP200 textbook, Section 1.4 (pp. 29-31)
+lambda-expressions.md | COMP200 | COMP200 textbook, Section 4.3 "Java 8 Lambda Expressions" (pp. 123-124)
+nested-and-inner-classes.md | COMP200 | COMP200 textbook, Section 4.3 (pp. 119-123)
+objects-and-classes.md | COMP200 | COMP200 textbook, Chapter 1, Sections 1.1-1.2 (pp. 1-15)
+overriding-vs-overloading.md | COMP200 | COMP200 textbook, Section 3.3 (pp. 83-86), table on p. 105
+packages-and-jar-files.md | COMP200 | COMP200 textbook, Section 1.5 (pp. 32-39)
+software-engineering-and-abstraction.md | COMP200 | COMP200 textbook, Section 2.1 (pp. 43-48)
+static-vs-instance-members.md | COMP200 | COMP200 textbook, Chapter 1, Sections 1.2 (pp. 8-10) and 1.6 (pp. 39-42)
+abstract-factory.md | COMP301 | GoF textbook, Abstract Factory, Ch. 3 Creational Patterns, pp. 87-96
+adapter.md | COMP301 | GoF textbook, Adapter, Ch. 4 Structural Patterns, pp. 139-150
+bridge.md | COMP301 | GoF textbook, Bridge, Ch. 4 Structural Patterns, pp. 151-162
+builder.md | COMP301 | GoF textbook, Builder, Ch. 3 Creational Patterns, pp. 97-106
+chain-of-responsibility.md | COMP301 | GoF textbook, Chain of Responsibility, Ch. 5 Behavioral Patterns, pp. 223-232
+class-and-object-relationships.md | COMP301 | GoF textbook, Ch. 1 Introduction, Sec. 1.5 "Organizing the Catalog" (pp. 9-11) and Sec. 1.6 "Relating Run-Time and Compile-Time Structures" (pp. 22-23), "Specifying Object Implementations" (pp. 14-16)
+command.md | COMP301 | GoF textbook, Command, Ch. 5 Behavioral Patterns, pp. 233-242
+composite.md | COMP301 | GoF textbook, Composite, Ch. 4 Structural Patterns, pp. 163-174
+decorator.md | COMP301 | GoF textbook, Decorator, Ch. 4 Structural Patterns, pp. 175-184
+delegation-and-coupling.md | COMP301 | GoF textbook, Ch. 1 Introduction, Sec. 1.6 "Delegation" (pp. 20-21), "Designing for Change" (pp. 23-25), "Relating Run-Time and Compile-Time Structures" (pp. 22-23)
+design-principles.md | COMP301 | GoF textbook, Ch. 1 Introduction, Sec. 1.6 "Class versus Interface Inheritance" (p. 16), "Programming to an Interface" (p. 17), "Inheritance versus Composition" (pp. 18-20), "Inheritance versus Parameterized Types" (p. 21)
+facade.md | COMP301 | GoF textbook, Facade, Ch. 4 Structural Patterns, pp. 185-193
+factory-method.md | COMP301 | GoF textbook, Factory Method, Ch. 3 Creational Patterns, pp. 107-116 (and Discussion of Creational Patterns, pp. 135-136)
+flyweight.md | COMP301 | GoF textbook, Flyweight, Ch. 4 Structural Patterns, pp. 195-206
+interpreter.md | COMP301 | GoF textbook, Interpreter, Ch. 5 Behavioral Patterns, pp. 243-255
+iterator.md | COMP301 | GoF textbook, Iterator, Ch. 5 Behavioral Patterns, pp. 257-271
+mediator.md | COMP301 | GoF textbook, Mediator, Ch. 5 Behavioral Patterns, pp. 273-282
+memento.md | COMP301 | GoF textbook, Memento, Ch. 5 Behavioral Patterns, pp. 283-291
+observer.md | COMP301 | GoF textbook, Observer, Ch. 5 Behavioral Patterns, pp. 293-302
+prototype.md | COMP301 | GoF textbook, Prototype, Ch. 3 Creational Patterns, pp. 117-126 (and Discussion of Creational Patterns, pp. 135-136)
+proxy.md | COMP301 | GoF textbook, Proxy, Ch. 4 Structural Patterns, pp. 207-217 (and Discussion of Structural Patterns, pp. 219-221)
+singleton.md | COMP301 | GoF textbook, Singleton, Ch. 3 Creational Patterns, pp. 127-134
+state.md | COMP301 | GoF textbook, State, Ch. 5 Behavioral Patterns, pp. 305-313
+strategy.md | COMP301 | GoF textbook, Strategy, Ch. 5 Behavioral Patterns, pp. 315-323
+template-method.md | COMP301 | GoF textbook, Template Method, Ch. 5 Behavioral Patterns, pp. 325-330
+visitor.md | COMP301 | GoF textbook, Visitor, Ch. 5 Behavioral Patterns, pp. 331-344
+single-responsibility-principle.md | COMP301 lecture slides | Lecture 2 (Software Design Principles)
+open-closed-principle.md | COMP301 lecture slides | Lecture 2; Lecture 3 (CCP link)
+liskov-substitution-principle.md | COMP301 lecture slides | Lecture 2
+interface-segregation-principle.md | COMP301 lecture slides | Lecture 2
+dependency-inversion-principle.md | COMP301 lecture slides | Lecture 2; Lecture 3 (ADP)
+solid-overview.md | COMP301 lecture slides | Lecture 2; Lecture 3 (roadmap)
+software-rot.md | COMP301 lecture slides | Lecture 2
+stupid-principles.md | COMP301 lecture slides | Lecture 2
+why-software-design.md | COMP301 lecture slides | Lecture 1
+package-principles-overview.md | COMP301 lecture slides | Lecture 3
+reuse-release-equivalence-principle.md | COMP301 lecture slides | Lecture 3
+common-reuse-principle.md | COMP301 lecture slides | Lecture 3
+common-closure-principle.md | COMP301 lecture slides | Lecture 3
+acyclic-dependencies-principle.md | COMP301 lecture slides | Lecture 3
+stable-dependencies-principle.md | COMP301 lecture slides | Lecture 3
+stable-abstractions-principle.md | COMP301 lecture slides | Lecture 3
+refactoring-overview.md | COMP301 lecture slides | Lecture 10
+refactoring-composing-methods.md | COMP301 lecture slides | Lecture 10
+refactoring-moving-features.md | COMP301 lecture slides | Lecture 10
+refactoring-organizing-data.md | COMP301 lecture slides | Lecture 10
+refactoring-simplifying-conditionals.md | COMP301 lecture slides | Lecture 10
+refactoring-simplifying-method-calls.md | COMP301 lecture slides | Lecture 10
+refactoring-generalisation.md | COMP301 lecture slides | Lecture 10
+waterfall-model.md | Internet (not course material) | https://en.wikipedia.org/wiki/Waterfall_model
+sdlc.md | Internet (not course material) | https://en.wikipedia.org/wiki/Systems_development_life_cycle ; https://en.wikipedia.org/wiki/Software_development_process
+validation-vs-verification.md | Internet (not course material) | https://en.wikipedia.org/wiki/Software_verification_and_validation
+cohesion.md | Internet (not course material) | https://en.wikipedia.org/wiki/Cohesion_(computer_science)
+coupling-metrics-and-types.md | Internet (not course material) | https://en.wikipedia.org/wiki/Coupling_(computer_programming)
+dry-kiss-yagni.md | Internet (not course material) | https://en.wikipedia.org/wiki/Don%27t_repeat_yourself ; https://en.wikipedia.org/wiki/KISS_principle ; https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it
+dependency-injection.md | Internet (not course material) | https://en.wikipedia.org/wiki/Dependency_injection ; https://en.wikipedia.org/wiki/Inversion_of_control ; https://en.wikipedia.org/wiki/Dependency_inversion_principle ; https://martinfowler.com/articles/injection.html
+abstraction-encapsulation-modularity.md | Internet (not course material) | https://en.wikipedia.org/wiki/Abstraction_(computer_science) ; https://en.wikipedia.org/wiki/Encapsulation_(computer_programming) ; https://en.wikipedia.org/wiki/Modular_programming ; https://en.wikipedia.org/wiki/Information_hiding ; https://en.wikipedia.org/wiki/Code_reuse
+top-down-vs-bottom-up-design.md | Internet (not course material) | https://en.wikipedia.org/wiki/Top-down_and_bottom-up_design
+design-thinking.md | Internet (not course material) | https://ixdf.org/literature/topics/design-thinking ; https://en.wikipedia.org/wiki/Design_thinking
+software-requirements-documents.md | Internet (not course material) | https://en.wikipedia.org/wiki/Software_requirements_specification ; https://en.wikipedia.org/wiki/System_requirements_specification ; https://en.wikipedia.org/wiki/Software_design_description ; https://en.wikipedia.org/wiki/Test_plan ; https://en.wikipedia.org/wiki/IEEE_829 ; https://en.wikipedia.org/wiki/Integration_testing
+design-patterns-overview.md | Internet (not course material) | https://en.wikipedia.org/wiki/Software_design_pattern
+model-view-controller.md | Internet (not course material) | https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller ; https://martinfowler.com/eaaDev/uiArchs.html ; https://sourcemaking.com/design_patterns/observer
+code-smells.md | Internet (not course material) | https://en.wikipedia.org/wiki/Code_smell ; https://sourcemaking.com/refactoring/smells ; https://sourcemaking.com/refactoring/smells/long-method ; https://sourcemaking.com/refactoring/smells/feature-envy ; https://sourcemaking.com/refactoring/smells/shotgun-surgery ; https://sourcemaking.com/refactoring/smells/large-class ; https://sourcemaking.com/refactoring/smells/duplicate-code
+anti-patterns-singleton.md | Internet (not course material) | https://en.wikipedia.org/wiki/Singleton_pattern
+open-closed-principle.md | Internet (not course material) | https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle
+composition-over-inheritance.md | Internet (not course material) | https://en.wikipedia.org/wiki/Composition_over_inheritance
+marker-interface.md | Internet (not course material) | https://en.wikipedia.org/wiki/Marker_interface
+serializable.md | Internet (not course material) | https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/io/Serializable.html
+law-of-demeter.md | Internet (not course material) | https://en.wikipedia.org/wiki/Law_of_Demeter
+covariant-return-types.md | Internet (not course material) | https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html
+open-closed-principle-true-false.md | Internet (not course material) | https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle
+java-interfaces.md | Internet (not course material) | https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html
+decorator-pattern.md | Internet (not course material) | https://en.wikipedia.org/wiki/Decorator_pattern
+multiple-inheritance-java.md | Internet (not course material) | https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html
+string-immutability.md | Internet (not course material) | https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/String.html
+list-remove-overload.md | Internet (not course material) | https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/util/List.html
+string-is-not-mutable.md | Internet (not course material) | https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/String.html
+java-keywords-vs-identifiers.md | Internet (not course material) | https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html
